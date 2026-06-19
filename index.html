@@ -571,7 +571,6 @@ body {
   100% { background: transparent; }
 }
 </style>
-  <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -692,7 +691,7 @@ body {
   <div id="bible-entries"></div>
   <div id="day-display"></div>
   <div id="phase-display"></div>
-  <div id="write-input"></div>
+  <textarea id="write-input" style="display:none"></textarea>
   <div id="modal-prompt"></div>
   <div id="lantern-icon-wrap"></div>
   <div id="btn-light-lantern"></div>
@@ -1487,15 +1486,7 @@ function copyTrainingContract(){
 function downloadTrainingContract(){
   const contract=document.getElementById('training-contract-text').textContent;
   const parentHash=State.training.lastExportHash||'unknown';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LongWatch Training Contract</title><style>body{background:#08080d;color:#c4bca0;font-family:monospace;padding:32px;max-width:800px;margin:0 auto;line-height:1.7;}h1{color:#c89a40;border-bottom:1px solid #7a5e1e;padding-bottom:8px;margin-bottom:24px;}pre{white-space:pre-wrap;font-size:12px;}</style></head><body><h1>The Long Watch — Training Contract</h1><p style="color:#7e7868;font-size:12px">Parent Hash: ${parentHash} · Export: ${new Date().toISOString()}</p><pre>${contract.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
-</script>
-</body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LongWatch Training Contract</title><style>body{background:#08080d;color:#c4bca0;font-family:monospace;padding:32px;max-width:800px;margin:0 auto;line-height:1.7;}h1{color:#c89a40;border-bottom:1px solid #7a5e1e;padding-bottom:8px;margin-bottom:24px;}pre{white-space:pre-wrap;font-size:12px;}</style></head><body><h1>The Long Watch — Training Contract</h1><p style="color:#7e7868;font-size:12px">Parent Hash: ${parentHash} · Export: ${new Date().toISOString()}</p><pre>${contract.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`;
   const blob=new Blob([html],{type:'text/html'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -2086,16 +2077,25 @@ function continueWatch(){
   renderAll();
 }
 function resetWatch(){
-  if(!confirm('Reset the watch? All progress will be lost.'))return;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9998;display:flex;align-items:center;justify-content:center;padding:32px';
+  overlay.innerHTML='<div style="background:#16161a;border:1px solid #3a3a40;padding:32px 28px;max-width:340px;width:100%;font-family:Crimson Text,Georgia,serif;color:#c8c5b0;text-align:center"><div style="font-size:16px;margin-bottom:12px;color:#c89a40;letter-spacing:.1em">RESET THE WATCH?</div><div style="font-size:13px;color:#8a8770;margin-bottom:28px;line-height:1.7">All 365 days, all entries, and the living organism will be erased. This cannot be undone.</div><div style="display:flex;gap:12px;justify-content:center"><button id="_reset_confirm" style="flex:1;padding:12px;background:transparent;color:#c87070;border:1px solid #7a3030;font-family:inherit;font-size:13px;letter-spacing:.12em;cursor:pointer">ERASE</button><button id="_reset_cancel" style="flex:1;padding:12px;background:transparent;color:#8a8770;border:1px solid #3a3a40;font-family:inherit;font-size:13px;letter-spacing:.12em;cursor:pointer">KEEP</button></div></div>';
+  document.body.appendChild(overlay);
+  document.getElementById('_reset_cancel').onclick=()=>overlay.remove();
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+  document.getElementById('_reset_confirm').onclick=function(){
+  overlay.remove();
   localStorage.removeItem(SAVE_KEY);
   localStorage.removeItem('THE_LONG_WATCH_ZEITGEIST_STATE');
   Object.assign(State,{day:1,hour:12,season:'winter',lightOn:false,weather:'calm',bibleMood:'awakening',entries:[],operatorWritings:[],worldLog:[],gameStartDate:null,gameComplete:false,version:'2.0.0',currentRoom:null,visitor:null,lastTickAt:null,lastAbsence:0,light:{forgottenNights:0,lastLitDay:0,consecutiveForgotten:0},glossary:{},episode:{current:null,history:[],cycleStartDay:1,beatFired:false},training:{scars:[],imprints:[],sessions:[],ghostSessions:[],lastExportHash:null,lastExportDate:null},milestones:{},phase:{last:'uncertain',ceremonyFired:{}}});
   LongWatchZeitgeist.import({fragments:[],opinions:[],score:0,dominantTheme:'emergence',crescendoScore:0});
-  document.getElementById('app').style.display='none';
+  // Hide game UI, show start screen
+  const rpgUi=document.getElementById('text-rpg-ui');if(rpgUi)rpgUi.style.display='none';
   document.getElementById('start-screen').style.display='flex';
   const ob=document.getElementById('start-onboarding');if(ob)ob.style.display='block';
   const btnStart=document.querySelector('.btn-start:not(.secondary)');if(btnStart)btnStart.style.display='inline-block';
   document.getElementById('btn-continue').style.display='none';
+  }; // close _reset_confirm.onclick
 }
 function init(){
   const hasGame=loadGame();
@@ -2587,11 +2587,18 @@ window.addEventListener('DOMContentLoaded',init);
     window.startWatch = function() {
       if (origStart) origStart();
       showTextUI();
+      // Suppress the old-UI write modal — text RPG uses inline textarea
       setTimeout(() => {
+        if (typeof closeModal === 'function') closeModal('modal-write');
         updateTextLog();
         updateTextStatus();
-      }, 200);
+        // Scroll to bottom so first world log is visible
+        const log = document.getElementById('text-log');
+        if (log) log.scrollTop = log.scrollHeight;
+      }, 900);
     };
+    // Wire startNewWatch NOW (after patch), replacing the premature assignments
+    window.startNewWatch = window.startWatch;
 
     const origContinue = window.continueWatch;
     window.continueWatch = function() {
@@ -3494,8 +3501,6 @@ window.addEventListener('DOMContentLoaded',init);
     boot();
   }
 
-  window.startNewWatch = window.startWatch;
-
   // ── Android hardware back button ─────────────────────────────────────────
   document.addEventListener('backbutton', function(e) {
     e.preventDefault();
@@ -3760,7 +3765,6 @@ window.addEventListener('DOMContentLoaded',init);
     }
   }, false);
 
-  window.startNewWatch = window.startWatch;
 })();
 
 // ═══════════════════════════════════════════════════════════════════════
