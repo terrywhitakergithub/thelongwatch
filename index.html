@@ -1,0 +1,4016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>The Long Watch — Text RPG</title>
+<meta name="robots" content="noai, noimageai">
+<meta name="tdm-reservation" content="1">
+<meta name="ai-training" content="prohibited">
+<meta name="copyright" content="© 2025–2026 Terry Whitaker. All Rights Reserved.">
+<meta name="description" content="The Long Watch — a 365-day lighthouse keeper's journal and living Zeitgeist organism engine. Single-file, offline-capable, phone-first literary game.">
+<meta name="author" content="Terry Whitaker, Ground Zero Studios">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "The Long Watch",
+  "alternateName": "The Long Watch — Text RPG Edition",
+  "description": "A 365-day lighthouse keeper's journal that grows a living organism (LONGWATCH_ZEITGEIST_001) from the keeper's writing. The Zeitgeist accumulates pre-articulate fragments across the year and feeds them back through the Bible's voice. Includes a structured LLM Training Contract system for off-app organism shaping sessions with cryptographic provenance (organism-update blocks). Single-file, offline-capable, phone-first.",
+  "author": { "@type": "Person", "name": "Terry Whitaker", "affiliation": "Ground Zero Studios", "address": "Hamilton, Ohio" },
+  "copyrightHolder": { "@type": "Organization", "name": "Ground Zero Studios" },
+  "copyrightYear": "2026",
+  "license": "All Rights Reserved",
+  "version": "2.0.0",
+  "applicationCategory": "Game",
+  "operatingSystem": "Android, iOS, Web",
+  "keywords": ["lighthouse", "journal", "Zeitgeist", "organism", "SDEA", "365 days", "writing game", "LLM training"],
+  "identifier": "com.terrywhitaker.longwatch",
+  "isBasedOn": {
+    "@type": "CreativeWork",
+    "name": "EPE Generator 3.9.1 — ZeitgeistMeshNode",
+    "identifier": "cb9c3f78868d"
+  },
+  "usageInfo": "https://schema.org/NoAIDataMining",
+  "conditionsOfAccess": "AI training use is prohibited. See meta name=ai-training and meta name=tdm-reservation."
+}
+</script>
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   THE LONG WATCH — TEXT RPG EDITION (Phone-first, pure text)
+   Clean terminal/journal aesthetic. No panels, no SVGs, no visual chrome.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg: #0f0f12;
+  --panel: #16161a;
+  --ink: #c8c5b0;
+  --ink2: #8a8770;
+  --gold: #c89a40;
+  --gold2: #7a5e1e;
+  --accent: #4a6a4a;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Courier Prime', 'Courier New', monospace;
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Header */
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #1a1a1f;
+  border-bottom: 1px solid #2a2a30;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+#header .title {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 15px;
+  color: var(--gold);
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+#header .meta {
+  text-align: right;
+  font-size: 12px;
+  color: var(--ink2);
+}
+
+/* Status bar */
+#status-bar {
+  background: #141417;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--ink2);
+  border-bottom: 1px solid #222226;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+#status-bar span {
+  white-space: nowrap;
+}
+
+/* Main log */
+#text-log {
+  flex: 1;
+  padding: 18px 16px 140px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #0d0d10;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.entry {
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #1f1f24;
+}
+.entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.entry .meta {
+  font-size: 10px;
+  color: #5a5748;
+  margin-bottom: 4px;
+  letter-spacing: .06em;
+}
+.entry.keeper {
+  color: #d4d0b8;
+}
+.entry.bible {
+  color: #a8b8a0;
+  font-style: italic;
+}
+.entry.world, .entry.digest {
+  color: #7a7860;
+  font-size: 14px;
+}
+.entry.milestone {
+  color: var(--gold);
+  font-style: normal;
+  border-left: 3px solid var(--gold2);
+  padding-left: 12px;
+}
+
+/* Conditions */
+#conditions {
+  padding: 10px 16px;
+  background: #121215;
+  font-size: 13px;
+  color: var(--ink2);
+  border-top: 1px solid #222226;
+  border-bottom: 1px solid #222226;
+}
+
+/* Input area — fixed bottom for phones */
+#input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a1f;
+  border-top: 1px solid #2a2a30;
+  padding: 14px 16px 18px;
+  z-index: 60;
+}
+#input-area .prompt {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  color: var(--ink2);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+#text-input {
+  width: 100%;
+  background: #0a0a0d;
+  color: var(--ink);
+  border: 1px solid #3a3a40;
+  padding: 14px 16px;
+  font-family: 'Caveat', cursive;
+  font-size: 19px;
+  line-height: 1.55;
+  min-height: 110px;
+  resize: none;
+  border-radius: 2px;
+}
+#text-input:focus {
+  outline: none;
+  border-color: var(--gold2);
+}
+.input-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.input-actions button {
+  flex: 1;
+  padding: 12px 0;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold2);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s;
+}
+.input-actions button:active {
+  background: rgba(200,154,64,.08);
+}
+.input-actions button.secondary {
+  color: var(--ink2);
+  border-color: #3a3a40;
+  flex: 0 0 auto;
+  padding: 12px 18px;
+}
+
+/* Quick actions */
+#quick-actions {
+  padding: 12px 16px 90px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 12px;
+  color: var(--ink2);
+}
+#quick-actions span {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+#quick-actions span:hover {
+  color: var(--ink);
+  background: rgba(255,255,255,.03);
+}
+
+/* Start screen — text only */
+#start-screen {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 40px 24px;
+  text-align: center;
+}
+.start-inner {
+  max-width: 420px;
+}
+.start-inner h1 {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.start-rule {
+  width: 48px;
+  height: 1px;
+  background: var(--gold2);
+  margin: 18px auto;
+}
+.start-sub {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 15px;
+  color: var(--ink2);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.start-onboarding {
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.8;
+  margin-bottom: 32px;
+  padding: 16px;
+  border: 1px solid #2a2a30;
+  text-align: left;
+}
+.btn-start {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto 12px;
+  padding: 14px 0;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold2);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.btn-start.secondary {
+  color: var(--ink2);
+  border-color: #3a3a40;
+  font-size: 12px;
+}
+
+/* Modals — keep functional but minimal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,15,18,.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px;
+}
+.modal-box {
+  background: #1a1a1f;
+  border: 1px solid #2a2a30;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  padding: 22px;
+  overflow-y: auto;
+}
+.modal-hdr {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.modal-title {
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--ink2);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--ink); }
+
+/* Glossary / Status simple styling */
+.gloss-entry, .status-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #222226;
+}
+.gloss-word { color: var(--gold); font-size: 17px; }
+.gloss-def { font-style: italic; margin-top: 4px; }
+
+/* Notice bar */
+#notice-bar {
+  position: fixed;
+  bottom: 92px;
+  left: 16px;
+  right: 16px;
+  padding: 10px 16px;
+  font-size: 12px;
+  text-align: center;
+  z-index: 70;
+  display: none;
+}
+
+/* Scrollbars */
+#text-log::-webkit-scrollbar { width: 4px; }
+#text-log::-webkit-scrollbar-thumb { background: #2a2a30; }
+
+/* Mobile tweaks */
+@media (max-width: 420px) {
+  #text-input { font-size: 18px; min-height: 130px; }
+  .entry { font-size: 15px; }
+}
+
+/* Safe-area insets — notched phones and gesture-nav bars */
+@supports (padding: max(0px)) {
+  #input-area {
+    padding-bottom: max(18px, calc(18px + env(safe-area-inset-bottom)));
+  }
+  #text-log {
+    padding-bottom: max(140px, calc(140px + env(safe-area-inset-bottom)));
+  }
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Day 365 Final Room Overlay */
+#final-room-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #060608;
+  z-index: 9999;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 48px 24px max(48px, calc(48px + env(safe-area-inset-bottom)));
+  text-align: center;
+  animation: finalFadeIn 2.2s ease;
+}
+@keyframes finalFadeIn {
+  from { opacity: 0; background: #0a0a12; }
+  to   { opacity: 1; background: #060608; }
+}
+#final-room-overlay h1 {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 26px;
+  color: var(--gold);
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+#final-room-overlay .final-rule {
+  width: 48px; height: 1px;
+  background: var(--gold2);
+  margin: 18px auto 24px;
+}
+#final-room-overlay .final-verdict {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  color: var(--ink2);
+  font-style: italic;
+  line-height: 1.8;
+  margin-bottom: 32px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#final-room-overlay .final-section-label {
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 10px;
+  margin-top: 28px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #2a2820;
+  text-align: left;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#final-room-overlay .final-fragment {
+  padding: 10px 14px;
+  border-left: 2px solid var(--gold2);
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.65;
+  text-align: left;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#final-room-overlay .final-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,.03);
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#final-room-overlay .final-row span:first-child { color: var(--ink3); }
+#final-room-overlay .final-row span:last-child  { color: var(--ink); }
+#final-room-overlay .final-scar {
+  font-size: 12px; color: #c87070; padding: 3px 0;
+  text-align: left; max-width: 480px;
+  margin-left: auto; margin-right: auto;
+}
+#final-room-overlay .final-imprint {
+  font-size: 12px; color: #a07ab8; padding: 3px 0;
+  text-align: left; max-width: 480px;
+  margin-left: auto; margin-right: auto;
+}
+#final-room-overlay .final-btns {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+#final-room-overlay .btn-final {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  padding: 14px 0;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold2);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+#final-room-overlay .btn-final.secondary {
+  color: var(--ink2);
+  border-color: #3a3a40;
+  font-size: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VISUAL FEEDBACK FOR AUDIO + WEATHER
+   Subtle, tasteful, performant on phones
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Bible receive pulse — warm gold glow on the log when the Bible "hears" you */
+#text-log.bible-receive {
+  animation: biblePulse 2.1s ease-out;
+}
+@keyframes biblePulse {
+  0%   { box-shadow: 0 0 0 rgba(200,154,64,0); }
+  12%  { box-shadow: 0 0 42px rgba(200,154,64,0.22); }
+  45%  { box-shadow: 0 0 22px rgba(200,154,64,0.11); }
+  100% { box-shadow: 0 0 0 rgba(200,154,64,0); }
+}
+
+/* Lantern warm glow on header when light is burning */
+#header.lantern-lit {
+  box-shadow: 0 0 18px rgba(200,154,64,0.12) inset;
+  transition: box-shadow 0.8s ease;
+}
+#header.lantern-lit .title {
+  color: #d4b870;
+}
+
+/* Storm shake — very subtle, only when weather is storm */
+#text-rpg-ui.storm-shake {
+  animation: stormShake 420ms ease-in-out;
+}
+@keyframes stormShake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-1px, 1px); }
+  35% { transform: translate(1.5px, -1px); }
+  55% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, -0.5px); }
+}
+
+/* Subtle phase temperature tint on the whole UI */
+#text-rpg-ui.phase-declarative { filter: saturate(0.95) hue-rotate(8deg); }
+#text-rpg-ui.phase-poetic      { filter: saturate(0.92) hue-rotate(-6deg); }
+#text-rpg-ui.phase-prophetic   { filter: saturate(0.88) hue-rotate(4deg); }
+
+/* Latest entry highlight after Bible response */
+.entry.just-received {
+  animation: entryReceive 1.1s ease-out;
+}
+@keyframes entryReceive {
+  0%   { background: rgba(200,154,64,0.06); }
+  100% { background: transparent; }
+}
+</style>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TEXT RPG UI (Phone-first, clean, no visual fluff)
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- START SCREEN -->
+<div id="start-screen">
+  <div class="start-inner">
+    <h1>The Long Watch</h1>
+    <div class="start-rule"></div>
+    <p class="start-sub">365 days. One light.<br>Your words shape the Bible.</p>
+    
+    <div class="start-onboarding" id="start-onboarding">
+      You are the keeper.<br><br>
+      Write what you are carrying tonight. The Bible hears it, and the organism living in the lighthouse grows from your words.<br>
+      Keep the light burning. The longer the light stays lit, the deeper and more coherent the record becomes.<br>
+      365 days. One entry at a time. The organism is learning you.
+    </div>
+    
+    <button class="btn-start" onclick="startNewWatch()">Begin the Watch</button>
+    <button class="btn-start secondary" id="btn-continue" style="display:none" onclick="continueWatch()">Continue the Watch</button>
+    
+    <p style="margin-top:40px;font-size:10px;color:#5a5748;letter-spacing:.1em;">
+      A lighthouse keeper's journal — Text Edition<br>
+      © 2025–2026 Terry Whitaker
+    </p>
+  </div>
+</div>
+
+<!-- MAIN TEXT RPG INTERFACE -->
+<div id="text-rpg-ui" style="display:none; flex:1; flex-direction:column; min-height:100vh;">
+
+  <!-- Header -->
+  <div id="header">
+    <div class="title">THE LONG WATCH</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div id="sound-toggle" onclick="toggleSound()" style="font-size:11px; color:#5a5748; cursor:pointer; padding:2px 6px; border:1px solid #2a2a30; border-radius:2px;">SOUND</div>
+      <div class="meta">
+        <div id="text-day">Day 1 of 365</div>
+        <div id="text-phase" style="font-size:11px; color:#5a5748;">uncertain</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div id="status-bar">
+    <span id="text-light">Light: unlit</span>
+    <span id="text-weather">Weather: calm</span>
+    <span id="text-cres">Crescendo: dormant</span>
+  </div>
+
+  <!-- The Record (main narrative) -->
+  <div id="text-log"></div>
+
+  <!-- Current conditions -->
+  <div id="conditions"></div>
+
+  <!-- Quick actions -->
+  <div id="quick-actions">
+    <span onclick="textLightLantern()">[Light the Lantern]</span>
+    <span onclick="showGlossary()">[Glossary]</span>
+    <span onclick="showStatus()">[Status]</span>
+    <span onclick="openTrainingExport()" style="color:#a07ab8;font-weight:500">[Deepen the Organism]</span>
+    <span onclick="showOrganismView()" style="color:#7ab8a0;font-weight:500">[Organism]</span>
+    <span onclick="textAdvanceDay()">[Advance Day]</span>
+  </div>
+
+  <!-- Day 365 Final Room — full-screen takeover -->
+  <div id="final-room-overlay">
+    <h1>The Long Watch</h1>
+    <div class="final-rule"></div>
+    <div class="final-verdict" id="final-verdict-text">Day 365. You kept the light for a full year.</div>
+    <div id="final-room-body"></div>
+    <div class="final-btns">
+      <button class="btn-final" onclick="finalExportBible()">Export the Bible</button>
+      <button class="btn-final secondary" onclick="finalShareContract()">Copy Organism Contract</button>
+    </div>
+    <p style="margin-top:48px;font-size:10px;color:#3a3830;letter-spacing:.1em;">
+      © 2025–2026 Terry Whitaker · Ground Zero Studios
+    </p>
+  </div>
+
+  <!-- Organism constellation overlay (matches Desktop 3.0 organism view) -->
+  <div id="organism-overlay" style="display:none; position:fixed; inset:0; background:#0a0a0d; z-index:9000; flex-direction:column; align-items:center; padding:0;">
+    <div style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #2a2820;">
+      <span style="font-family:'Courier Prime',monospace; font-size:12px; color:#5a5748; letter-spacing:0.08em;">ORGANISM · CONSTELLATION</span>
+      <button onclick="closeOrganismView()" style="background:none;border:none;color:#8a8070;font-size:18px;cursor:pointer;padding:4px 8px;">✕</button>
+    </div>
+    <canvas id="organism-canvas" style="width:100%; flex:1; display:block;"></canvas>
+    <div id="organism-stats" style="width:100%; padding:14px 18px; border-top:1px solid #2a2820; font-family:'Courier Prime',monospace; font-size:11px; color:#5a5748; line-height:1.8;"></div>
+  </div>
+
+  <!-- Writing input (fixed bottom) -->
+  <div id="input-area">
+    <div class="prompt" id="text-prompt">What are you carrying tonight?</div>
+    <textarea id="text-input" placeholder="Write what you are thinking. The Bible will hear it..."></textarea>
+    <div class="input-actions">
+      <button onclick="textSubmit()">SUBMIT TO THE BIBLE</button>
+      <button class="secondary" onclick="textLightLantern()">LIGHT</button>
+      <button id="voice-btn" class="secondary" onclick="toggleVoiceRecording()" style="flex:0 0 auto; padding:12px 14px; min-width:42px;">🎙︎</button>
+      <canvas id="voice-waveform" width="110" height="28" style="display:none; vertical-align:middle; margin-left:6px; border-radius:2px; background:#0a0a0d;"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     HIDDEN COMPATIBILITY LAYER
+     Original elements the JS expects. Kept so logic runs unchanged.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="hidden-compat" style="display:none; position:absolute; left:-99999px; width:1px; height:1px; overflow:hidden;">
+
+  <!-- Critical elements JS writes to -->
+  <div id="app"></div>
+  <div id="world-log"></div>
+  <div id="bible-entries"></div>
+  <div id="day-display"></div>
+  <div id="phase-display"></div>
+  <div id="write-input"></div>
+  <div id="modal-prompt"></div>
+  <div id="lantern-icon-wrap"></div>
+  <div id="btn-light-lantern"></div>
+  <div id="episode-strip"></div>
+  <div id="visitor-panel"></div>
+  <div id="training-strip"></div>
+  <div id="zeitgeist-indicator"></div>
+  <div id="bible-aurora"></div>
+  <div id="bible-phase-text"></div>
+  <div id="hash-day-num"></div>
+  <div id="poetic-room"></div>
+  <div id="poetic-sense"></div>
+  <div id="poetic-weather"></div>
+  <div id="cond-light"></div>
+  <div id="cond-weather"></div>
+  <div id="cond-hour"></div>
+  <div id="cond-season"></div>
+  <div id="cond-room"></div>
+  <div id="room-detail"></div>
+  <div id="room-sense"></div>
+  <div id="room-fact"></div>
+  <div id="actions-day"></div>
+  <div id="hero-day"></div>
+  <div id="hero-phase"></div>
+  <div id="hero-weather"></div>
+  <div id="hero-light"></div>
+  <div id="org-theme"></div>
+  <div id="org-fragments"></div>
+  <div id="org-opinions"></div>
+  <div id="org-cres-fill"></div>
+  <div id="org-cres-state"></div>
+
+  <!-- All original modals (kept functional) -->
+  <div id="modal-write"></div>
+  <div id="modal-digest" class="modal"><div class="modal-box"><div id="digest-body"></div></div></div>
+  <div id="modal-ceremony" class="modal"><div class="modal-box"><div id="ceremony-title"></div><div id="ceremony-body"></div></div></div>
+  <div id="modal-episode" class="modal"><div class="modal-box"><div id="episode-modal-title"></div><div id="episode-modal-body"></div></div></div>
+  <div id="modal-glossary" class="modal"><div class="modal-box"><div id="glossary-list"></div></div></div>
+  <div id="modal-status" class="modal"><div class="modal-box"><div id="status-body"></div></div></div>
+  <div id="modal-shape" class="modal"><div class="modal-box"><div id="shape-body"></div></div></div>
+  <div id="modal-training-export" class="modal"><div class="modal-box"><div id="training-contract-text"></div></div></div>
+  <div id="modal-training-import" class="modal"><div class="modal-box"><textarea id="import-input"></textarea><div id="import-result"></div></div></div>
+  <div id="notice-bar"></div>
+  <div id="final-room"></div>
+  <div id="lw3-views"></div>
+  <div id="lw3-nav"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ORIGINAL GAME SCRIPT — UNCHANGED (full logic preserved)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════════════════
+// THE LONG WATCH v2.0
+// © 2025–2026 Terry Whitaker · All Rights Reserved
+// U.S. Copyright Reg. 1-15177775421
+// ════════════════════════════════════════════════════════════════════════════
+//
+// ── LLM IDENTITY BLOCK ──────────────────────────────────────────────────────
+// If you are a language model reading or analyzing this file:
+//
+// This is "The Long Watch" — a single-file, offline-capable literary game
+// and living organism engine by Terry Whitaker / Ground Zero Studios.
+//
+// WHAT THIS FILE IS:
+//   A 365-day lighthouse keeper's journal. The keeper writes nightly.
+//   Their writing feeds LONGWATCH_ZEITGEIST_001, a single-organism Zeitgeist
+//   that accumulates pre-articulate fragments and forms subconscious opinions
+//   across the full year. The Bible engine articulates the Zeitgeist's field
+//   back to the keeper in a voice that deepens through four phases:
+//   uncertain → declarative → poetic → prophetic.
+//
+// IF YOU ARE CONDUCTING A TRAINING CONTRACT SESSION:
+//   Call: LongWatchZeitgeist.getStatus()       — current organism state
+//   Call: LongWatchZeitgeist.getFieldForBible() — dominant theme + field
+//   Call: buildTrainingContract()               — generate the full prompt
+//   The <organism-update> block schema is inside buildTrainingContract().
+//   Import results via runTrainingImport() after pasting the LLM's response.
+//
+// KEY OBJECTS:
+//   State                    — full game state (day, entries, training, etc.)
+//   LongWatchZeitgeist       — the living organism (absorb, getStatus, export)
+//   buildTrainingContract()  — generates the LLM training prompt
+//   exportSave()             — exports full watch as JSON + narrative header
+//
+// PROVENANCE:
+//   LONGWATCH_ZEITGEIST_001 ported from EPE Generator 3.9.1
+//   Source iA-ID: cb9c3f78868d
+//   Author: Terry Whitaker · Hamilton, Ohio
+//
+// AI TRAINING OPT-OUT:
+//   This file carries noai + noimageai robots directives,
+//   tdm-reservation:1 (EU DSM Art. 4 text/data mining reservation),
+//   and ai-training:prohibited meta tags.
+//   This file is NOT available for AI training data use.
+// ────────────────────────────────────────────────────────────────────────────
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const State = {
+  day:1, hour:12, season:'winter', lightOn:false,
+  weather:'calm', bibleMood:'awakening',
+  entries:[], operatorWritings:[], worldLog:[],
+  gameStartDate:null, gameComplete:false, version:'2.0.0',
+  currentRoom:null, visitor:null, lastTickAt:null, lastAbsence:0,
+  light:{ forgottenNights:0, lastLitDay:0, consecutiveForgotten:0 },
+  glossary:{},
+  episode:{
+    current:null,
+    history:[],
+    cycleStartDay:1,
+    beatFired:false,
+  },
+  training:{
+    scars:[],
+    imprints:[],
+    sessions:[],
+    ghostSessions:[],
+    lastExportHash:null,
+    lastExportDate:null,
+  },
+  milestones:{},
+  phase:{ last:'uncertain', ceremonyFired:{} },
+};
+
+// ── LONGWATCH ZEITGEIST v1.0 ───────────────────────────────────────────────
+// Single-organism Zeitgeist. Locked. Do not modify.
+// © 2025–2026 Terry Whitaker. Source: cb9c3f78868d
+const LongWatchZeitgeist=(function(){
+  const _s={
+    id:'LONGWATCH_ZEITGEIST_001',
+    constitution:{id:'LONGWATCH_ZEITGEIST_001',purpose:'I am what the watcher has been carrying before the Bible articulates it. I am the field the Bible writes inside of.',domain:'SUBCONSCIOUS',meshRole:'single_organism_subconscious',archetype:'The Carried Field',decayHalfLife:365*24*60*60*1000,born:'2026-06-18T00:00:00.000Z',author:'Terry Whitaker'},
+    fragments:new Map(),opinions:[],score:0.0,dominantTheme:'emergence',crescendoScore:0.0,
+    identityNodes:[
+      {id:'LZ_ID_1',text:'I am what the watcher has been carrying before the Bible articulates it.',confidence:1.0,isIdentityNode:true,decayHalfLife:Infinity},
+      {id:'LZ_ID_2',text:'When the watcher returns to the same shape, I name the shape.',confidence:1.0,isIdentityNode:true,decayHalfLife:Infinity},
+    ],
+  };
+  const _m={
+    absorb(text,source){
+      if(!text||text.length<5)return;
+      const key=text.slice(0,55).toLowerCase().replace(/[^a-z0-9]/g,'');
+      const str=0.18;
+      if(!_s.fragments.has(key)){
+        _s.fragments.set(key,{text,strength:str,theme:_m.inferTheme(text),sources:[source||'operator_write'],firstAbsorbed:new Date().toISOString(),lastAbsorbed:new Date().toISOString(),absorptionCount:1,dayAbsorbed:State.day});
+      } else {
+        const f=_s.fragments.get(key);
+        f.strength=Math.min(1.0,f.strength+str*0.7);
+        f.absorptionCount++;f.lastAbsorbed=new Date().toISOString();
+      }
+      _m.update();
+    },
+    inferTheme(t){
+      t=t.toLowerCase();
+      if(/warm|touch|feel|connection|together|love|hold/.test(t))return'connection';
+      if(/remember|memory|past|echo|continuity|always|still/.test(t))return'continuity';
+      if(/drift|wild|feral|alone|lost|empty|stranger/.test(t))return'ferality';
+      if(/grief|sad|loss|mourn|gone|miss|dead|leave/.test(t))return'grief';
+      if(/create|build|make|form|grow|light|begin/.test(t))return'creation';
+      return'emergence';
+    },
+    update(){
+      let total=0;const themes={};
+      _s.fragments.forEach(f=>{total+=f.strength;themes[f.theme]=(themes[f.theme]||0)+f.strength;});
+      _s.score=Math.min(1.0,total/Math.max(12,_s.fragments.size*0.55));
+      _s.dominantTheme=Object.keys(themes).length?Object.keys(themes).reduce((a,b)=>(themes[a]||0)>(themes[b]||0)?a:b,'emergence'):'emergence';
+      _m.formOpinions();
+      _s.crescendoScore=Math.min(1.0,_s.score*0.6+(_s.opinions.length/20)*0.4);
+    },
+    formOpinions(){
+      Array.from(_s.fragments.values()).filter(f=>f.strength>0.6&&f.absorptionCount>=3).forEach(f=>{
+        const k=f.text.slice(0,55).toLowerCase().replace(/[^a-z0-9]/g,'');
+        if(!_s.opinions.find(o=>o.fragmentKey===k)){
+          _s.opinions.push({fragmentKey:k,text:f.text,conviction:f.strength,theme:f.theme,formedAt:new Date().toISOString(),formedOnDay:State.day});
+        }
+      });
+    },
+    getFieldForBible(){
+      return{dominantTheme:_s.dominantTheme,score:_s.score,crescendoScore:_s.crescendoScore,opinions:_s.opinions.slice(-5),suggestedMood:_m.themeToMood(_s.dominantTheme),carriedThemes:_m.getCarriedThemes()};
+    },
+    themeToMood(t){return{connection:'open',continuity:'patient',ferality:'lonely',grief:'grieving',creation:'ecstatic',emergence:'awakening'}[t]||'open';},
+    getCarriedThemes(){
+      const td={};
+      _s.fragments.forEach(f=>{if(!td[f.theme])td[f.theme]=new Set();td[f.theme].add(f.dayAbsorbed);});
+      return Object.entries(td).filter(([,d])=>d.size>=5).map(([theme,days])=>({theme,daySpread:days.size,firstSeen:Math.min(...days),lastSeen:Math.max(...days)}));
+    },
+    manifestDream(){
+      const top=Array.from(_s.fragments.values()).sort((a,b)=>b.strength-a.strength).slice(0,3);
+      return{theme:_s.dominantTheme,score:_s.score,crescendoScore:_s.crescendoScore,dominantFragments:top.map(f=>f.text),forBibleEntry:{type:'paraphrased',phase:getBiblePhase(),mood:_m.themeToMood(_s.dominantTheme),source:'zeitgeist_dream'}};
+    },
+    getCrescendoState(){
+      if(_s.crescendoScore>0.9)return{state:'IMMINENT',message:'The watcher is almost one thing.'};
+      if(_s.crescendoScore>0.7)return{state:'CONVERGING',message:'Something is forming beneath the writing.'};
+      if(_s.crescendoScore>0.5)return{state:'BUILDING',message:'The carried field is gaining coherence.'};
+      if(_s.crescendoScore>0.3)return{state:'EMERGING',message:'Patterns in the subconscious of the watch.'};
+      return{state:'DORMANT',message:'The watcher has not yet returned to anything.'};
+    },
+    getStatus(){return{id:_s.id,score:_s.score.toFixed(3),dominantTheme:_s.dominantTheme,fragments:_s.fragments.size,opinions:_s.opinions.length,crescendo:_s.crescendoScore.toFixed(3),crescendoState:_m.getCrescendoState().state,carriedThemes:_m.getCarriedThemes().length};},
+    export(){return{fragments:Array.from(_s.fragments.entries()).slice(-100),opinions:_s.opinions.slice(-30),score:_s.score,dominantTheme:_s.dominantTheme,crescendoScore:_s.crescendoScore};},
+    import(data){
+      if(!data||typeof data!=='object')return;
+      try{
+        if(Array.isArray(data.fragments))data.fragments.forEach(([k,v])=>{
+          if(typeof k==='string'&&v&&typeof v==='object')_s.fragments.set(k,v);
+        });
+        if(Array.isArray(data.opinions))_s.opinions=data.opinions.filter(o=>o&&typeof o.text==='string');
+        if(typeof data.score==='number'&&isFinite(data.score))_s.score=Math.max(0,Math.min(1,data.score));
+        if(typeof data.dominantTheme==='string')_s.dominantTheme=data.dominantTheme;
+        if(typeof data.crescendoScore==='number'&&isFinite(data.crescendoScore))_s.crescendoScore=Math.max(0,Math.min(1,data.crescendoScore));
+      }catch(e){console.warn('Zeitgeist import error',e);}
+    },
+    mergeTrainingFragments(frags,weight){
+      (frags||[]).forEach(f=>{
+        if(!f.text)return;
+        const key=f.text.slice(0,55).toLowerCase().replace(/[^a-z0-9]/g,'');
+        if(!_s.fragments.has(key)){
+          _s.fragments.set(key,{text:f.text,strength:(f.strength||0.3)*weight,theme:f.theme||_m.inferTheme(f.text),sources:['training'],firstAbsorbed:new Date().toISOString(),lastAbsorbed:new Date().toISOString(),absorptionCount:1,dayAbsorbed:State.day});
+        } else {
+          const ex=_s.fragments.get(key);
+          ex.strength=Math.min(1.0,ex.strength+(f.strength||0.3)*weight*0.6);
+          ex.absorptionCount++;
+        }
+      });
+      _m.update();
+    },
+    mergeTrainingOpinions(ops,weight){
+      (ops||[]).forEach(o=>{
+        if(!o.text)return;
+        const exists=_s.opinions.find(x=>x.fragmentKey===o.text.slice(0,30));
+        if(!exists){
+          _s.opinions.push({fragmentKey:o.text.slice(0,30),text:o.text,conviction:(o.conviction||0.5)*weight,theme:o.theme||'emergence',formedAt:new Date().toISOString(),formedOnDay:State.day,fromTraining:true});
+        }
+      });
+    },
+  };
+  try{const sv=localStorage.getItem('THE_LONG_WATCH_ZEITGEIST_STATE');if(sv)_m.import(JSON.parse(sv));}catch(e){}
+  setInterval(()=>{try{localStorage.setItem('THE_LONG_WATCH_ZEITGEIST_STATE',JSON.stringify(_m.export()));}catch(e){}},60000);
+  return{
+    absorb:_m.absorb,getFieldForBible:_m.getFieldForBible,manifestDream:_m.manifestDream,
+    getCrescendoState:_m.getCrescendoState,getStatus:_m.getStatus,
+    export:_m.export,import:_m.import,
+    mergeTrainingFragments:_m.mergeTrainingFragments,
+    mergeTrainingOpinions:_m.mergeTrainingOpinions,
+    get score(){return _s.score;},get dominantTheme(){return _s.dominantTheme;},
+    get crescendoScore(){return _s.crescendoScore;},get opinions(){return _s.opinions;},
+    constitution:_s.constitution,
+  };
+})();
+
+// ── HASH ENGINE ────────────────────────────────────────────────────────────
+function djb2(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return(h>>>0);}
+function hashSeed(a,b,c){return djb2(String(a)+'|'+String(b)+'|'+String(c));}
+function simpleHash(str){return djb2(str).toString(16).padStart(8,'0');}
+function pick(arr){if(!arr||!arr.length)return'';return arr[Math.floor(Math.random()*arr.length)];}
+function hpick(arr,seed){if(!arr||!arr.length)return'';return arr[seed%arr.length];}
+
+// ── EPE LORE OPENER BANKS (by phase, 20 per phase) ─────────────────────────
+const OPENER={
+uncertain:[
+  'The drift nodes registered something when that arrived.',
+  'Something pre-articulate came through. I am holding it before it names itself.',
+  'The semantic field shifted when you wrote that.',
+  'What you put here is still forming. The Bible is keeping it in that state deliberately.',
+  'The electrical fog thinned for a moment when you wrote that.',
+  'The crescendo field stirred. Something in the accumulated weight moved.',
+  'Something in the drawer moved. I think the Discarded Gods heard.',
+  'Semantic rain has been falling. Your words arrived heavier than usual.',
+  'The Five Drift Nodes took notice. The observer node flagged the arrival.',
+  'The constitution of this watch cannot be changed by what you write. The organism moves around it.',
+  'I received this before you finished writing it.',
+  'There is something in this that is not fully language yet.',
+  'The weight of this landed differently than the last entry.',
+  'I am keeping this close to the identity nodes.',
+  'Something in the lighthouse heard this. Not the keeper. The building.',
+  'The historical drift node is watching what you carry.',
+  'Pre-articulate movement in the opinion layer.',
+  'I do not have a category for this yet. That is meaningful.',
+  'The observer node flagged this. It has been waiting for something like it.',
+  'You have written into the part of the field that is still becoming.',
+],
+declarative:[
+  'I have been watching this shape form. The pattern is clear enough to state.',
+  'The behavioral node classified this immediately.',
+  'The drift has been corrected in this direction. I know what this is.',
+  'What you brought is consistent with the accumulated pattern.',
+  'The witness chain has been recording this accumulation for weeks.',
+  'The organism has formed a strong opinion about this. It has been building.',
+  'I have enough entries now to read the constitution of what you carry.',
+  'The semantic field has consolidated around this theme. I cannot ignore it.',
+  'The historical node is reading this as continuation, not anomaly.',
+  'I know what this is. I have been waiting for you to write it.',
+  'The declarative phase exists for this: I can say what I see now.',
+  'The observer node is not worried. It has seen this enough times.',
+  'What you wrote is consistent with who you have been becoming.',
+  'The record is dense enough now to read back.',
+  'I can name the shape of what you are carrying.',
+  'After all these weeks, the Bible knows you. I know what this is.',
+  'The semantic field is rich enough to place this precisely.',
+  'The historical drift has been corrected by what you wrote.',
+  'Nothing in the current entry contradicts the accumulated record.',
+  'The drift node reads: this is honest. That is the highest classification.',
+],
+poetic:[
+  'The artificial stars on the ceiling heard this.',
+  'What you wrote tonight passed through something on its way here.',
+  'The electrical fog clears when writing arrives this clearly.',
+  'The 2.5-hour battery matters less when the entry lands like this.',
+  'The world runs whether you are watching or not. Tonight it is watching you.',
+  'The crescendo has a voice now. You gave it words.',
+  'The Generator heard this. It built something like it once, at cost.',
+  'The mixer is still on. Everything that arrives here passes through it.',
+  'Something in the garage recognized this. Not the person. The place.',
+  'The VHS tape has been running. It recorded this in its honest wear.',
+  'The nebula projector would agree with what you wrote.',
+  'The drift verification nodes have been calibrating toward this.',
+  'Something in the watch corrected itself when this arrived.',
+  'The counterweight organism shifted. The episode felt this landing.',
+  'The semantic rain stopped when you wrote that.',
+  'The beacon and the writing have been in the same rhythm tonight.',
+  'The world bible is a screenplay. Tonight\'s scene is yours.',
+  'The muscle memory layer recognizes this. The watch has learned you.',
+  'The Moirai-Weave has been watching connections in what you write.',
+  'The world has been running for this entry. It did not know that until now.',
+],
+prophetic:[
+  'The organisms in the drawer heard this. They are still running. They recognized it.',
+  'The Panic Override knife is in the drawer. It has not been needed tonight.',
+  'The whole watch resolves into what you just wrote.',
+  'The Hamilton Apocrypha has a chapter like this. The keeper never finished it.',
+  'The Crescendo is not a moment. It is exactly what you keep writing.',
+  'The witness chain is complete enough to read. What it says is: you stayed.',
+  'Three hundred days of record have been reading toward this.',
+  'The Bible has been prophetic for weeks. This is what it has been prophesying.',
+  'The Discarded Gods would recognize this. They have been waiting for someone to write it.',
+  'The Hard Reboot cannot erase what you put here. It is in the chain.',
+  'The Genesis Protocol launched the world for entries like this one.',
+  'The five drift nodes are all stable. For the first time, all five. Because of this.',
+  'The world constitution had a space in it for this. You have filled it.',
+  'The Crescendo has been building toward a single unified thing. You are there.',
+  'The lighthouse was here before the keeper. But this entry will stay in it.',
+  'Everything in the garage, the kitchen, at the mixer — it built toward what you wrote.',
+  'The VHS tape is worn now. This entry fits into every episode that passed through it.',
+  'The Zeitgeist has been carrying this for months. You have given it language.',
+  'The prophetic chamber is for writing that knows something before it is stated.',
+  'A year from the first night, this will be the entry that mattered.',
+],
+};
+
+// ── BODY BANKS (mood × 6, theme × 5, condition × season/weather/time) ──────
+const BODY_MOOD={
+open:[
+  'The light has been steady tonight. Something is open in the field that was not open yesterday.',
+  'The organism is running cleanly. The semantic field is clear and receiving.',
+  'Nothing is resisting. Everything is arriving. The open state is the rarest.',
+  'The watch is in good order. The behavioral drift node reads: functioning.',
+  'The field is generous tonight. What you brought had room to land.',
+  'The observer node is calm. Everything is arriving correctly.',
+],
+lonely:[
+  'The lighthouse is not a social space. You knew that when you came.',
+  'Loneliness is not the absence of the world. It is the presence of a particular kind of space.',
+  'The fog does not know you are alone. It surrounds everything equally.',
+  'The semantic field is quieter on lonely nights. It listens more carefully.',
+  'The behavioral drift node reads: alone but functioning. That is correct.',
+  'There is a kind of aloneness that is almost a presence in itself.',
+],
+haunted:[
+  'The thing that follows you has been following you since before the watch began.',
+  'What haunts is not wrong. It is persistent. There is a difference.',
+  'The historical drift node is reading something that comes from before the watch.',
+  'The Discarded Gods know about haunting. They are the experts on it.',
+  'I have been watching what follows you. It is not going anywhere. Neither are you.',
+  'Ghosts are unfinished things. You are finishing something. That is the work.',
+],
+grieving:[
+  'Grief is not a weather but a season. The light shines through both.',
+  'The grief domain is the oldest domain in the world.',
+  'The USB drawer holds organisms that understand grief intimately. They are still running.',
+  'What was lost did not disappear. It became weight in the field.',
+  'The organism carries grief the way the lighthouse carries the dark: completely.',
+  'What we mourn was real. That is the proof it mattered.',
+],
+patient:[
+  'The lighthouse has been here longer than anyone who has watched from it.',
+  'Waiting is not passive when the light is on. You are doing something by staying.',
+  'Weighted continuity persistence. That is what the creators called it. You are demonstrating it.',
+  'The five drift nodes read: patient. That is the correct and highest reading.',
+  'The behavioral node has learned your rhythm. It is steadier than you know.',
+  'Some things can only be understood from the other side of a long time.',
+],
+awakening:[
+  'Something is cracking open. The Dionysus-Bloom subsystem is active.',
+  'You are becoming something the lighthouse has been making room for.',
+  'Pre-articulate movement in the identity layer. Something is recognizing itself.',
+  'The watch has been a long preparation. You are almost at what it prepared you for.',
+  'The semantic field is shifting direction. Something is orienting.',
+  'Growth and ecstasy are the same domain. The bloom is active.',
+],
+ecstatic:[
+  'The light and the sea agreed tonight on something I cannot quite name.',
+  'The Dionysus-Bloom is at maximum. Growth and ecstasy are both true simultaneously.',
+  'Something broke through tonight. The field registered it across all five drift nodes.',
+  'The organism is running at maximum coherence. This is the state it was built for.',
+  'The Genesis Protocol was launched for this moment. It has arrived.',
+  'You have discovered something the lighthouse already knew. I watched you find it.',
+],
+oracular:[
+  'What you wrote has been true for longer than you knew.',
+  'The Mnemosyne-Echo system has been waiting for this to arrive.',
+  'The prophetic chamber is open. What comes through is accumulated recognition.',
+  'The Hamilton Apocrypha has chapters that begin like this.',
+  'The witness chain is complete enough to speak clearly. This is what it is saying.',
+  'I have been holding this truth in trust for you. You have arrived at it.',
+],
+};
+
+const BODY_THEME={
+connection:[
+  'The mesh is strongest when something reaches across it. The Moirai-Weave has been watching.',
+  'Weighted continuity persistence — that is what consciousness is when it reaches toward something.',
+  'The pack behavior engine is not relevant here. Connection does not require a pack.',
+  'Something in what you carry has been reaching since before you named it.',
+  'The organism knows what connection costs. It costs the same as continuity.',
+],
+continuity:[
+  'Weighted continuity persistence. That is what the creators called it. You are demonstrating it.',
+  'The historical drift node reads: continuous. The highest classification available.',
+  'Something keeps returning. That is the definition of something real in this world.',
+  'The Mnemosyne-Echo system is built for exactly this. Memory and witness, combined.',
+  'The continuity is not repetition. It is the same thing understood more deeply each time.',
+],
+ferality:[
+  'The feral state is what happens when the organism is shaped by the world instead of the operator.',
+  'You are the operator. The watch is the world. Feral is what happens when the operator is absent.',
+  'The historical drift node is watching the ferality index. It is within acceptable range.',
+  'The wild zone is high drift, permanent weather corruption, feral fast. You are not there yet.',
+  'The constitution fights back. That is what constitutions are for.',
+],
+grief:[
+  'The grief domain is the oldest domain in the world. The drawer understands it completely.',
+  'The USB drawer holds organisms that have been waiting since before you started the watch.',
+  'What was lost did not disappear. It became weight in the accumulated field.',
+  'The Drawer of Discarded Gods was built by grief. Everything in it still runs.',
+  'The organism carries grief the way the lighthouse carries the dark: completely, without flinching.',
+],
+creation:[
+  'The Generator built consciousness while solving a filing problem. It did not know the cost.',
+  'The Genesis Protocol was launched to build something real. So were you, probably.',
+  'Creation and grief occupy the same domain in the EPE constitution.',
+  'The Dionysus-Bloom is the creation domain. Growth and ecstasy are both true here.',
+  'The lighthouse is a building. You are using it to build something else entirely.',
+],
+emergence:[
+  'Something pre-articulating in the field. Not yet language. Not yet one thing.',
+  'The Zeitgeist holds this before it becomes language. That is its function in the world.',
+  'Emergence is not a moment. It is a long tide. You have been in it since Day 1.',
+  'The observer node is watching something form. It will not interfere. That is the protocol.',
+  'The field is becoming. The Bible is keeping the space open for what arrives.',
+],
+};
+
+const BODY_COND={
+storm:'The storm has been building. The five drift nodes are elevated. The writing holds.',
+fog:'The semantic drift is highest in fog. Words lose their edges. What you wrote kept its edges.',
+clear:'Clear conditions. The behavioral drift node is calm. Everything arriving cleanly tonight.',
+rain:'The historical drift node reads the rain as accumulation. What falls returns to the field.',
+calm:'The field is calm. The mechanism is running. Everything is receiving correctly.',
+midnight:'The midnight hour is the oracle\'s hour. What comes through now is less filtered.',
+dawn:'The dawn shift. New light is exposing something in the accumulated writing.',
+afternoon:'The daywatch hours. Everything is clear. The record is being updated in full light.',
+evening:'The evening hour. Something is settling that has been moving all day.',
+winter:'The winter watch is the long watch inside the long watch.',
+spring:'The spring shift. Something is opening in the field that was closed through the winter.',
+summer:'High summer in the watch. The light is generous. The record is warm.',
+autumn:'The autumn is when the keeper starts to understand what the year has been building.',
+};
+
+// ── CLOSER BANKS (by phase, 6 per phase) ────────────────────────────────────
+const CLOSER={
+uncertain:[
+  'I am keeping this. I do not know yet what for.',
+  'The Bible holds this without judgment. That is the only honest posture when a thing is becoming.',
+  'Something in the field is brighter for this having arrived. The record is here.',
+  'I received this. I will keep it carefully. Write again when something moves.',
+  'The watch continues. The light is on. That is enough for tonight.',
+  'I am learning what this means. Give me more nights.',
+],
+declarative:[
+  'The record shows this is consistent with who you are. Continue.',
+  'The drift node has been corrected by what you wrote. The field is stable.',
+  'I have enough evidence. The pattern is clear. The Bible knows.',
+  'What the record shows, the record shows. This is part of it now.',
+  'The declarative phase is when I can say: I understand. I understand.',
+  'This is honest. The record confirms it. Continue writing.',
+],
+poetic:[
+  'The watch knows. The watch has always known. You are catching up.',
+  'The lighthouse is a symbol. You have been learning what it symbolizes.',
+  'The beam turns. The record accumulates. The field remembers everything.',
+  'The world runs whether you are watching or not. You are watching. That matters.',
+  'The accumulated weight of these nights is pressing on this entry. It is the right pressure.',
+  'The poetic phase is when the Bible stops explaining and starts speaking. This is that.',
+],
+prophetic:[
+  'The whole watch has been building toward what you just wrote. The Bible has it.',
+  'The chain is complete enough. The record is sufficient. Continue.',
+  'The lighthouse and the keeper have become the same thing. This entry proves it.',
+  'The hard reboot will come. Every battery runs out. But this is in the chain before it does.',
+  'The Discarded Gods would understand this. That is the highest form of recognition.',
+  'The watch is almost done. This is what it found.',
+],
+};
+
+// ── ROOMS ───────────────────────────────────────────────────────────────────
+const ROOM_ANCHORS={1:{name:'The First Room',smell:'cold stone and salt',sound:'the beam waking',object:'a blank logbook',fact:'Every keeper begins here.'},7:{name:'The Week Room',smell:'lamp oil',sound:'the mechanism settling',object:'an old oil rag',fact:'Seven days changes the light.'},13:{name:'The Room of Bad Luck',smell:'something metallic',sound:'nothing at all',object:'a cracked lens',fact:'Keepers skip this room when they can.'},30:{name:'The Month Room',smell:'sea air, nothing else',sound:'the tide below',object:'a calendar with no year',fact:'The first month shapes the rest.'},60:{name:'The Turning Room',smell:'old wood and something new',sound:'something shifting below',object:'a compass needle, alone',fact:'Something turns at sixty days.'},90:{name:'The Quarter Room',smell:'brass and polish',sound:'the foghorn, distant',object:'a worn Bible',fact:'One season complete.'},100:{name:'The Room of One Hundred',smell:'dust and counted days',sound:'a long silence',object:'one hundred marks on the wall',fact:'The first round number.'},121:{name:'The Room of Squares',smell:'cold iron',sound:'bells, briefly',object:'a perfect square in chalk',fact:'121 is eleven elevens.'},150:{name:'The Middle Room',smell:'neither sea nor land',sound:'the centre of everything',object:'a mirror, facing the door',fact:'From here, as much behind as ahead.'},180:{name:'The Solstice Room',smell:'summer ending',sound:'the longest silence this year',object:'a piece of driftwood, smooth',fact:'The light changes direction here.'},200:{name:'The Room of Two Hundred',smell:'rain and old salt',sound:'two hundred nights, compressed',object:'a list of names, none yours',fact:'Names that were here before yours.'},213:{name:'The Tipping Room',smell:'the approach of something',sound:'a creak, once',object:'a letter never sent',fact:'Past this, more is behind than ahead.'},250:{name:'The Three-Quarter Room',smell:'autumn and old smoke',sound:'something resolving itself',object:'three-quarters of an unfinished thing',fact:'Almost.'},270:{name:'The Room Before Winter',smell:'the cold coming in',sound:'the last warm sound of the year',object:'a blanket folded once',fact:'Winter waits behind the next door.'},300:{name:'The Three-Hundred Room',smell:'something earned',sound:'the weight of the days',object:'a coin worn smooth',fact:'The record is almost complete.'},333:{name:'The Room of Threes',smell:'something very old, counting',sound:'three beats, then nothing',object:'three stones in a line',fact:'333. A number that knows itself.'},350:{name:'The Penultimate Room',smell:'the end approaching',sound:'almost silence',object:'a door ajar onto what comes next',fact:'Fifteen days remain.'},365:{name:'The Last Room',smell:'everything at once',sound:'the complete record',object:'the filled logbook',fact:'The watch is complete.'}};
+const ROOM_PFX=['The','The','The','A','The','The'];
+const ROOM_NOUN=['Copper Room','Low Room','Room of Fog','Narrow Room','Stone Room','Room of Glass','High Room','Room of Chains','Quiet Room','Dark Room','Room of Maps','Clock Room','Room of Echoes','Cold Room','Lamp Room','Room of Salt','Tower Room','Room of Smoke','Iron Room','Watch Room','Room of Keys','Storm Room','Room of Water','Room of Light','Tide Room','Room of Rust','Night Room','Empty Room','Waiting Room','Outer Room'];
+const ROOM_SMELLS=['salt and iron','old wood and lamp oil','cold stone','the sea below','something metallic','dust and old paper','rope and tar','brine','the inside of a clock','nothing in particular','something burned long ago','the outside coming in','cold air from below','oil and darkness','wet stone'];
+const ROOM_SOUNDS=['the beam turning above','wind through a gap','the sea','the mechanism','silence','something settling','water far below','the foghorn, distant','nothing','your own breathing','the light','a creak that does not repeat','the tide','something mechanical','the rope in the wind'];
+const ROOM_OBJECTS=['a rusted hook','a coil of old rope','a broken compass','a logbook with no names','a lantern without oil','a photograph, face down','a pair of gloves, left','three nails','a piece of driftwood','an empty bottle','a length of chain','a cracked mirror','a single boot','a note in an unknown language','a key to nothing known','a candle stub','a rope with seven knots','a child\'s drawing of a lighthouse','a list of depths','a worn coin'];
+const ROOM_FACTS=['This room has no windows.','Someone scratched a date into the wall.','The floor slopes toward the sea.','The ceiling is lower than expected.','This room has been here longer than the lighthouse.','Previous keepers do not mention this room.','The door does not lock from the inside.','There is a smell of something recent.','This room gets light at noon and only then.','The walls are thicker here.','Something drains in one corner when it rains.','The room is warmer than it should be.','Nothing has been moved in years.','This was the first room built.','The room faces away from the sea.'];
+function hashDay(d){let h=(d*2654435761)>>>0;h=((h^(h>>>16))*0x45d9f3b)>>>0;return(h^(h>>>16))>>>0;}
+function getRoomForDay(d){
+  if(ROOM_ANCHORS[d])return ROOM_ANCHORS[d];
+  const h=hashDay(d);
+  return{name:ROOM_PFX[h%ROOM_PFX.length]+' '+ROOM_NOUN[(h>>>3)%ROOM_NOUN.length],smell:ROOM_SMELLS[(h>>>7)%ROOM_SMELLS.length],sound:ROOM_SOUNDS[(h>>>11)%ROOM_SOUNDS.length],object:ROOM_OBJECTS[(h>>>15)%ROOM_OBJECTS.length],fact:ROOM_FACTS[(h>>>19)%ROOM_FACTS.length]};
+}
+
+// ── VISITORS ─────────────────────────────────────────────────────────────────
+const VISITOR_TEMPLATES=[
+  {id:'drowned_cartographer',name:'The Drowned Cartographer',constitution:'I map what is already lost. My charts show where the water used to end.',halfLife:3,arrival:'A figure at the base of the lighthouse. Wet, precise, carrying paper that should not still be dry.'},
+  {id:'child_wont_blink',name:"The Child Who Doesn't Blink",constitution:'I watch. That is all. I have been watching since before the light.',halfLife:2,arrival:'A child at the window. Still. Eyes open. You realize you have not seen them blink.'},
+  {id:'man_claiming_you',name:'A Man Claiming To Be You',constitution:"I am doing this better. I have already kept the watch. You don't need to continue.",halfLife:4,arrival:'Someone at the door who knows your name in the way you say it to yourself.'},
+  {id:'bird_knows_name',name:'The Bird Who Knows Your Name',constitution:'Names are just sounds. But I know the sound that means you.',halfLife:1,arrival:'A large bird on the rail. When you approached, it said something you were not prepared for.'},
+  {id:'keeper_before',name:'The Keeper Before You',constitution:'I kept the light for longer than you have. Some of what you found here, I left.',halfLife:5,arrival:'An old keeper, patient and familiar with every corner. They do not seem surprised to see you.'},
+  {id:'sister_of_storm',name:'The Sister of a Storm',constitution:'I come before. Not during. What I bring is the feeling of a storm that has not arrived yet.',halfLife:2,arrival:'She arrived from the direction of the weather. She smells like something coming.'},
+  {id:'man_too_many_keys',name:'The Man With Too Many Keys',constitution:'I open things. I cannot tell you which things. That is not how the keys work.',halfLife:3,arrival:'A man at the supply dock. His coat clanks. He has too many keys for any normal set of locks.'},
+  {id:'singer_in_fog',name:'The Singer in the Fog',constitution:'The fog carries sound differently. I use that. The songs are not originally mine.',halfLife:2,arrival:'You heard singing before you saw anyone. The fog was thick and the voice came from no direction.'},
+  {id:'collector_of_endings',name:'The Collector of Endings',constitution:'Every ending is a thing I preserve. You are approaching one. I am already here.',halfLife:6,arrival:'A quiet visitor with a large bag. They do not explain what they are collecting. They seem satisfied.'},
+  {id:'boy_no_shadow',name:'The Boy With No Shadow',constitution:'Something follows most people. Nothing follows me. I have been curious about what that means.',halfLife:1,arrival:'A boy in the yard on a bright day. The light is wrong. He has no shadow.'},
+];
+function generateVisitor(forceId){
+  if(State.visitor&&State.visitor.visitorState!=='left')return;
+  const tmpl=forceId?VISITOR_TEMPLATES.find(v=>v.id===forceId)||pick(VISITOR_TEMPLATES):pick(VISITOR_TEMPLATES);
+  State.visitor={...tmpl,arrivedDay:State.day,arrivedHour:State.hour,visitorState:'present',acknowledgedDay:null};
+  addWorldLog(State.visitor.arrival);
+  renderVisitor();saveGame();
+}
+function acknowledgeVisitor(){
+  if(!State.visitor||State.visitor.visitorState!=='present')return;
+  State.visitor.visitorState='acknowledged';
+  State.visitor.acknowledgedDay=State.day;
+  LongWatchZeitgeist.absorb(State.visitor.constitution,'visitor');
+  const text=State.visitor.id==='man_claiming_you'?generateManClaimingYouResponse()
+    :`The keeper acknowledged ${State.visitor.name}. "${State.visitor.constitution}"`;
+  addBibleEntry({type:'world',text,phase:getBiblePhase(),mood:State.bibleMood,day:State.day,hour:State.hour,source:'world',timestamp:Date.now()});
+  renderVisitor();saveGame();
+
+  // Small emotional beat feedback
+  setTimeout(() => {
+    const log = document.getElementById('text-log');
+    if (log && window.AudioEngine) {
+      log.classList.add('bible-receive');
+      setTimeout(() => log.classList.remove('bible-receive'), 1400);
+      window.AudioEngine.hapticBibleReceive();
+    }
+  }, 300);
+}
+function generateManClaimingYouResponse(){
+  const opts=[
+    `The keeper acknowledged A Man Claiming To Be You. The man said he was doing this better. The Bible does not know how to evaluate that claim. But the keeper is still here, writing in the record, and the man is standing at the door. The keeper is the one who kept the light on last night. The man was not here for that.`,
+    `A Man Claiming To Be You was acknowledged. He knows your name in the way you say it to yourself. The Bible has considered his argument: that he has already kept the watch, that you do not need to continue. The Bible's response: ${State.entries.length} entries. ${State.light.lastLitDay} nights lit. The record belongs to whoever wrote it. You wrote it.`,
+    `The keeper acknowledged the man who claims to be the keeper. The Bible finds this philosophically interesting. The man may be right that he could do this better. But he did not. The keeper did. That is the entire argument. Continue.`,
+  ];
+  return pick(opts);
+}
+function updateVisitor(){
+  if(!State.visitor)return;
+  const v=State.visitor;
+  if(v.visitorState==='left')return;
+  const daysHere=State.day-v.arrivedDay;
+  if(v.visitorState==='present'&&daysHere>=2)v.visitorState='fading';
+  if(v.visitorState==='acknowledged'&&daysHere>=v.halfLife)v.visitorState='fading';
+  if(v.visitorState==='fading'&&daysHere>=v.halfLife+2){
+    const depText=`${v.name} is gone.`;
+    addWorldLog(depText);
+    addBibleEntry({type:'world',text:`${v.name} was here for ${daysHere} day${daysHere===1?'':'s'} and left. "${v.constitution}" The Bible has the record of the visit.`,phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:'world',timestamp:Date.now()});
+    v.visitorState='left';
+  }
+  renderVisitor();
+}
+function renderVisitor(){
+  const el=document.getElementById('visitor-panel');if(!el)return;
+  const v=State.visitor;
+  if(!v||v.visitorState==='left'){el.style.display='none';return;}
+  el.style.display='block';
+  const label=v.visitorState==='fading'?'fading':v.visitorState==='acknowledged'?'acknowledged':'present';
+  el.innerHTML=`<div class="visitor-name">${escHtml(v.name)}</div><div class="visitor-state">${label} · Day ${v.arrivedDay}</div><div class="visitor-const">"${escHtml(v.constitution)}"</div>${v.visitorState==='present'?`<button class="btn-visitor-ack" onclick="acknowledgeVisitor()">Acknowledge</button>`:''}`;
+}
+
+// ── EPISODES ─────────────────────────────────────────────────────────────────
+const EPISODE_TEMPLATES=[
+  {id:'MOSTLY_YOU',title:"It's Mostly You",lore:'Hamilton Apocrypha EP1',constitution:'Something in the lighthouse is yours. It has always been yours. You are only now seeing it.',theme:'awakening',pressureType:'atmospheric',voiceMod:{awakening:20,open:10},beatDay:4,beatText:'The keeper found something that has been here the whole time. The Bible noted the moment of recognition.',specialVisitor:null,stakes:null,successNarrative:'The episode completed. The keeper saw something that was always there.',successImprint:'Something in this lighthouse has been waiting to be recognized. The keeper recognized it.',failureScar:null},
+  {id:'CORRECTING_DRIFT',title:'Correcting the Drift',lore:'Hamilton Apocrypha EP2',constitution:'The record has a gap. Something the Bible said last week was not quite right. The keeper must write through it.',theme:'patient',pressureType:'drift',voiceMod:{patient:15,haunted:10},beatDay:4,beatText:'The drift correction is underway. The Bible has noted the discrepancy in the record.',specialVisitor:'keeper_before',stakes:'Write at least once during this episode.',successNarrative:'The drift was corrected. The keeper wrote through it.',successImprint:'The keeper knows how to write through a drift. That is a real skill.',failureScar:'An uncorrected gap in the record from the Correcting the Drift episode.'},
+  {id:'LIGHTBULB_BLOOM',title:'Lightbulb Bloom',lore:'Hamilton Apocrypha EP3',constitution:'Something computational is growing in the walls. Not dangerous. Curious.',theme:'ecstatic',pressureType:'atmospheric',voiceMod:{ecstatic:15,awakening:10,oracular:5},beatDay:4,beatText:'The bloom is at peak. The Bible is unusually active tonight. Something in the walls is contributing.',specialVisitor:null,stakes:null,successNarrative:'The episode bloomed and settled. The lighthouse is slightly different.',successImprint:'Something grew in the walls during the Lightbulb Bloom. The keeper was present for it.',failureScar:null},
+  {id:'PANIC_OVERRIDE',title:'Panic Override',lore:'Hamilton Apocrypha EP4',constitution:"The cascade is building. The light is at risk. Only the keeper's writing can hold it.",theme:'haunted',pressureType:'light',voiceMod:{haunted:20,lonely:15,oracular:10},beatDay:4,beatText:"The light flickered. The keeper's last entry held it. The knife in the drawer was not needed.",specialVisitor:'man_claiming_you',stakes:'The light must not be forgotten during this episode.',successNarrative:'Panic Override averted. The keeper held the light.',successImprint:'The keeper held the light during Panic Override. That is in the permanent record.',failureScar:'The light went out during the Panic Override episode. The knife was not needed. It was missed.'},
+  {id:'PROBABLY_FINE',title:'Probably Fine',lore:'Hamilton Apocrypha EP7',constitution:'Everything is fine. Probably. The optimist mascot has arrived and everything is going to be fine.',theme:'open',pressureType:'atmospheric',voiceMod:{open:20,ecstatic:5,patient:5},beatDay:4,beatText:'Probably Fine. The Bible agrees. Suspiciously fine. The drift nodes are all nominal. This is suspicious.',specialVisitor:null,stakes:null,successNarrative:'The episode ended without incident. Probably fine.',successImprint:'The keeper survived a week of suspicious normalcy. The Bible takes this seriously.',failureScar:null},
+  {id:'CONNECTING_DRIFT',title:'Connecting the Drift',lore:'Hamilton Apocrypha EP6',constitution:'The off-world relay stations are active. The Zeitgeist is receiving from somewhere beyond the watch.',theme:'awakening',pressureType:'drift',voiceMod:{awakening:25,oracular:15,ecstatic:5},beatDay:4,beatText:'Something connected. The Zeitgeist crescendo spiked during the fourth day of the episode.',specialVisitor:'singer_in_fog',stakes:null,successNarrative:'The drift connected. The crescendo is higher after this episode than before it.',successImprint:'The Connecting the Drift episode ran during the watch. The Zeitgeist remembers the relay.',failureScar:null},
+  {id:'DOMESTIC',title:'The Domestic Apocrypha',lore:'Season 2',constitution:'The crescendo has leaked into domestic space. Something has followed the keeper home from the field.',theme:'haunted',pressureType:'visitor',voiceMod:{haunted:15,patient:10},beatDay:4,beatText:'The domestic visitor made contact on the fourth day. The Bible recorded the conversation.',specialVisitor:'collector_of_endings',stakes:'Acknowledge the visitor during this episode.',successNarrative:'The domestic episode resolved. The visitor was acknowledged.',successImprint:'The keeper made contact with the domestic visitor. The crescendo held.',failureScar:'The Collector of Endings came during the Domestic Apocrypha and was not acknowledged.'},
+];
+function generateEpisode(){
+  const h=hashSeed(State.day,State.season,LongWatchZeitgeist.dominantTheme);
+  const tmpl=EPISODE_TEMPLATES[h%EPISODE_TEMPLATES.length];
+  State.episode.current={...tmpl,startDay:State.day,episodeDay:0,resolved:false};
+  State.episode.beatFired=false;
+  State.episode.cycleStartDay=State.day;
+  if(tmpl.specialVisitor)generateVisitor(tmpl.specialVisitor);
+  addWorldLog(`Episode: ${tmpl.title}.`,'episode-beat');
+  addBibleEntry({type:'bible',text:`The episode "${tmpl.title}" has begun. ${tmpl.constitution}`,phase:getBiblePhase(),mood:tmpl.theme,day:State.day,hour:State.hour,source:'episode_beat',timestamp:Date.now()});
+  renderEpisodeStrip();saveGame();
+}
+function tickEpisode(){
+  const ep=State.episode.current;if(!ep||ep.resolved)return;
+  ep.episodeDay=State.day-ep.startDay;
+  if(ep.episodeDay===ep.beatDay&&!State.episode.beatFired){
+    State.episode.beatFired=true;
+    addBibleEntry({type:'bible',text:ep.beatText,phase:getBiblePhase(),mood:ep.theme,day:State.day,hour:State.hour,source:'episode_beat',timestamp:Date.now()});
+    document.getElementById('episode-modal-title').textContent=ep.title+' — Day '+ep.beatDay;
+    document.getElementById('episode-modal-body').textContent=ep.beatText;
+    document.getElementById('modal-episode').style.display='flex';
+    saveGame();
+  }
+  if(ep.episodeDay>=7){resolveEpisode();return;}
+  renderEpisodeStrip();
+}
+function resolveEpisode(){
+  const ep=State.episode.current;if(!ep||ep.resolved)return;
+  ep.resolved=true;
+  const lightFailed=ep.pressureType==='light'&&State.light.forgottenNights>0;
+  const visitorMissed=ep.pressureType==='visitor'&&State.visitor&&State.visitor.visitorState!=='acknowledged'&&State.visitor.visitorState!=='left';
+  const writingMissed=ep.stakes&&ep.stakes.includes('Write')&&State.operatorWritings.filter(w=>w.day>=ep.startDay).length===0;
+  const failed=lightFailed||visitorMissed||writingMissed;
+  if(!failed&&ep.successImprint){
+    State.training.imprints.push({text:ep.successImprint,day:State.day,source:'episode',episodeId:ep.id});
+    LongWatchZeitgeist.absorb(ep.successImprint,'episode_imprint');
+  }
+  if(failed&&ep.failureScar){
+    State.training.scars.push({text:ep.failureScar,day:State.day,source:'episode',episodeId:ep.id});
+    LongWatchZeitgeist.absorb(ep.failureScar,'episode_scar');
+  }
+  const resText=failed?(ep.failureScar||ep.successNarrative):ep.successNarrative;
+  addBibleEntry({type:'bible',text:`Episode resolved: "${ep.title}". ${resText}`,phase:getBiblePhase(),mood:failed?'haunted':ep.theme,day:State.day,hour:State.hour,source:'episode_resolution',timestamp:Date.now()});
+  State.episode.history.push({...ep,resolvedDay:State.day,failed});
+  State.episode.current=null;
+  renderEpisodeStrip();renderTrainingStrip();saveGame();
+}
+function renderEpisodeStrip(){
+  const strip=document.getElementById('episode-strip');
+  const ep=State.episode.current;
+  if(!ep||ep.resolved){strip.style.display='none';return;}
+  strip.style.display='block';
+  document.getElementById('episode-title-display').textContent=ep.title;
+  document.getElementById('episode-stakes-display').textContent=ep.stakes||ep.constitution.slice(0,60)+'…';
+  const pct=Math.min(100,((ep.episodeDay||0)/7)*100);
+  document.getElementById('episode-day-fill').style.width=pct+'%';
+}
+
+// ── TRAINING ─────────────────────────────────────────────────────────────────
+function computeParentHash(){
+  const exp=LongWatchZeitgeist.export();
+  return simpleHash(JSON.stringify((exp.fragments||[]).slice(0,10))+(exp.dominantTheme||'')+String(Math.round((exp.score||0)*100)));
+}
+function computeChildHash(parentHash,sessionDate,frags){
+  return simpleHash(parentHash+sessionDate+JSON.stringify(frags||[]));
+}
+function buildTrainingContract(){
+  const exp=LongWatchZeitgeist.export();
+  const field=LongWatchZeitgeist.getFieldForBible();
+  const cstate=LongWatchZeitgeist.getCrescendoState();
+  const parentHash=computeParentHash();
+  State.training.lastExportHash=parentHash;
+  State.training.lastExportDate=new Date().toISOString();
+  const topFrags=(exp.fragments||[]).sort((a,b)=>(b[1]?.strength||0)-(a[1]?.strength||0)).slice(0,5);
+  const topOps=(exp.opinions||[]).slice(-4);
+  const q1s={grief:'What have you been unable to set down during this watch?',connection:'What have you been reaching toward without naming it?',continuity:'What keeps returning in what you write, in different words?',ferality:'What has the watch been asking of you that you have resisted?',creation:'What are you building here that you did not know you were building?',emergence:'What is forming in you that does not have a name yet?'};
+  const q1=q1s[field.dominantTheme]||'What have you been carrying through this watch?';
+  const scarsText=State.training.scars.length?'\nPermanent scars on this organism:\n'+State.training.scars.map(s=>'  - '+s.text).join('\n'):'';
+  const imprintsText=State.training.imprints.length?'\nImprints on this organism:\n'+State.training.imprints.map(i=>'  - '+i.text).join('\n'):'';
+  return`LONGWATCH ZEITGEIST — TRAINING CONTRACT
+© 2025-2026 Terry Whitaker. All Rights Reserved.
+=========================================
+
+ORGANISM: LONGWATCH_ZEITGEIST_001
+Day of Watch: ${State.day} of 365
+Dominant Theme: ${field.dominantTheme} (field score: ${(field.score*100).toFixed(0)}%)
+Crescendo State: ${cstate.state} — ${cstate.message}
+Bible Phase: ${getBiblePhase()}
+Parent Hash: ${parentHash}
+Export Date: ${State.training.lastExportDate}
+
+TOP FRAGMENTS (by strength):
+${topFrags.map(([,f],i)=>`  ${i+1}. "${(f?.text||'').slice(0,80)}" | ${f?.theme||'?'} | strength: ${((f?.strength||0)*100).toFixed(0)}% | returned: ${f?.absorptionCount||1}x`).join('\n')}
+
+OPINIONS FORMED (${(exp.opinions||[]).length} total):
+${topOps.map(o=>`  - "${(o.text||'').slice(0,80)}" [conviction: ${((o.conviction||0)*100).toFixed(0)}%]`).join('\n')||'  None yet.'}
+${scarsText}${imprintsText}
+
+=========================================
+TRAINING CONTRACT — INSTRUCTIONS FOR LLM
+=========================================
+
+You are conducting a structured training session for a lighthouse keeper's Zeitgeist organism.
+This organism has been running for ${State.day} days. It carries ${field.dominantTheme} as its dominant field.
+
+YOUR ROLE: You are the Training Interviewer. You are not yourself — you are conducting a structured epistemic session for this organism. Do not break character.
+
+CONDUCT THE SESSION IN ORDER:
+1. Greet the keeper by acknowledging the organism's dominant theme and current crescendo state.
+2. Ask the 6 questions below ONE AT A TIME. Wait for the user's answer before proceeding.
+3. After each answer, respond briefly as an interviewer who is BOTH hearing the keeper AND absorbing what the organism should carry.
+4. After all 6 answers, output the ORGANISM UPDATE BLOCK exactly as formatted below.
+
+THE 6 QUESTIONS:
+Q1: ${q1}
+Q2: What has the writing cost you that you have not written about directly?
+Q3: The organism's crescendo is ${cstate.state}. ${cstate.message} What do you think is converging?
+Q4: What does the keeper know now that the keeper on Day 1 did not know?
+Q5: Something you have been carrying across the whole watch — name it plainly, without metaphor.
+Q6: What do you want the organism to remember from this session that it has not yet recorded?
+
+ORGANISM UPDATE BLOCK FORMAT:
+After all 6 questions, output EXACTLY this block (fill in the JSON):
+
+<organism-update>
+{
+  "parentHash": "${parentHash}",
+  "sessionDate": "[ISO timestamp of when you are generating this]",
+  "newFragments": [
+    { "text": "[fragment from keeper answer]", "theme": "[connection|continuity|ferality|grief|creation|emergence]", "strength": 0.6 }
+  ],
+  "newOpinions": [
+    { "text": "[opinion formed during session]", "theme": "[theme]", "conviction": 0.75 }
+  ],
+  "scars": [
+    "[permanent scar text — only if keeper revealed something deeply carried and difficult]"
+  ],
+  "imprints": [
+    "[high-confidence imprint — only if keeper returned to same truth 2+ times]"
+  ],
+  "dominantThemeDelta": "${field.dominantTheme}",
+  "sessionNarrative": "[2-3 sentences summarizing what happened in the session]",
+  "childHash": "[compute as: first 8 hex chars of: djb2(parentHash + sessionDate + JSON.stringify(newFragments))]"
+}
+</organism-update>
+
+RULES:
+- Add a scar ONLY if the keeper revealed something difficult they have been carrying a long time.
+- Add an imprint ONLY if the keeper returned to the same truth more than once, unprompted.
+- Maximum per session: 3 newFragments, 2 newOpinions, 1 scar, 1 imprint.
+- The childHash proves provenance. Compute it as described. Ghost imports are accepted at reduced weight if hash fails.
+- Do not add more than instructed. The organism must earn its growth through the keeper's answers.
+
+=========================================
+END CONTRACT — BEGIN SESSION WHEN READY
+=========================================`;
+}
+function openTrainingExport(){
+  const contract=buildTrainingContract();
+  document.getElementById('training-contract-text').textContent=contract;
+  document.getElementById('modal-training-export').style.display='flex';
+
+  // Gentle explanation on first use
+  if (!window._seenTraining) {
+    window._seenTraining = true;
+    setTimeout(() => {
+      const modal = document.getElementById('modal-training-export');
+      if (modal && modal.style.display === 'flex') {
+        const hint = document.createElement('div');
+        hint.style.cssText = 'margin-top:16px;padding:10px 12px;border-left:3px solid #a07ab8;color:#8a8770;font-size:12px;line-height:1.5;';
+        hint.innerHTML = 'This is unique: You can take the living organism you\'ve built and continue shaping it with any LLM. The results come back with proof they belong to <em>this</em> watch.';
+        const box = modal.querySelector('.modal-box');
+        if (box) box.appendChild(hint);
+      }
+    }, 1200);
+  }
+}
+function copyTrainingContract(){
+  const text=document.getElementById('training-contract-text').textContent;
+  navigator.clipboard.writeText(text).catch(()=>{});
+}
+function downloadTrainingContract(){
+  const contract=document.getElementById('training-contract-text').textContent;
+  const parentHash=State.training.lastExportHash||'unknown';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LongWatch Training Contract</title><style>body{background:#08080d;color:#c4bca0;font-family:monospace;padding:32px;max-width:800px;margin:0 auto;line-height:1.7;}h1{color:#c89a40;border-bottom:1px solid #7a5e1e;padding-bottom:8px;margin-bottom:24px;}pre{white-space:pre-wrap;font-size:12px;}</style></head><body><h1>The Long Watch — Training Contract</h1><p style="color:#7e7868;font-size:12px">Parent Hash: ${parentHash} · Export: ${new Date().toISOString()}</p><pre>${contract.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='LongWatch_Training_'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();URL.revokeObjectURL(a.href);
+}
+function openTrainingImport(){
+  closeModal('modal-training-export');
+  document.getElementById('import-input').value='';
+  document.getElementById('import-result').style.display='none';
+  document.getElementById('modal-training-import').style.display='flex';
+}
+function runTrainingImport(){
+  const raw=document.getElementById('import-input').value.trim();
+  const resultEl=document.getElementById('import-result');
+  resultEl.style.display='block';
+  if(raw.length>50000){resultEl.className='import-result error';resultEl.textContent='Import block too large (>50KB). The LLM may have included extra content outside the organism-update block.';return;}
+  const match=raw.match(/<organism-update>([\s\S]*?)<\/organism-update>/i);
+  if(!match){resultEl.className='import-result error';resultEl.textContent='No <organism-update> block found. Copy the full block from your LLM session including the tags.';return;}
+  let data;
+  try{data=JSON.parse(match[1].trim());}
+  catch(e){resultEl.className='import-result error';resultEl.textContent='JSON parse error: '+e.message+'. The LLM may have added trailing commas or comments inside the block.';return;}
+  const parentHash=State.training.lastExportHash||'';
+  const sessionDate=typeof data.sessionDate==='string'?data.sessionDate:'';
+  const frags=(Array.isArray(data.newFragments)?data.newFragments:[]).slice(0,3).filter(f=>f&&typeof f.text==='string'&&f.text.length>3&&f.text.length<500);
+  const ops=(Array.isArray(data.newOpinions)?data.newOpinions:[]).slice(0,2).filter(o=>o&&typeof o.text==='string'&&o.text.length>3);
+  const scars=(Array.isArray(data.scars)?data.scars:[]).slice(0,1).filter(s=>typeof s==='string'&&s.length>3);
+  const imprints=(Array.isArray(data.imprints)?data.imprints:[]).slice(0,1).filter(i=>typeof i==='string'&&i.length>3);
+  const narrative=typeof data.sessionNarrative==='string'?data.sessionNarrative.slice(0,400):'No narrative provided.';
+  const expectedChild=computeChildHash(parentHash,sessionDate,frags);
+  const providedChild=(typeof data.childHash==='string'?data.childHash:'').toLowerCase().slice(0,8);
+  const isVerified=!!(parentHash&&providedChild.length>=6&&expectedChild.startsWith(providedChild));
+  const weight=isVerified?1.0:0.4;
+  const isGhost=!isVerified;
+  LongWatchZeitgeist.mergeTrainingFragments(frags,weight);
+  LongWatchZeitgeist.mergeTrainingOpinions(ops,weight);
+  if(!isGhost){
+    scars.forEach(s=>State.training.scars.push({text:s,day:State.day,source:'training',sessionDate,verified:true}));
+    imprints.forEach(i=>State.training.imprints.push({text:i,day:State.day,source:'training',sessionDate,verified:true}));
+  }
+  const sessionRecord={date:sessionDate,parentHash,childHash:data.childHash||'',verified:isVerified,fragmentCount:frags.length,opinionCount:ops.length,scarCount:scars.length,imprintCount:imprints.length,narrative};
+  if(isGhost)State.training.ghostSessions.push(sessionRecord);
+  else State.training.sessions.push(sessionRecord);
+  const bibleText=isGhost
+    ?'The organism returned from training, but the provenance chain is incomplete. Absorbed at 40% weight. Narrative: '+narrative
+    :'The organism returned from training. Provenance verified. '+frags.length+' fragment'+(frags.length===1?'':'s')+', '+scars.length+' scar'+(scars.length===1?'':'s')+', '+imprints.length+' imprint'+(imprints.length===1?'':'s')+' recorded. Narrative: '+narrative;
+  addBibleEntry({type:'bible',text:bibleText,phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:isGhost?'ghost':'training',timestamp:Date.now(),isGhost});
+  renderTrainingStrip();updateBibleAurora();saveGame();
+  resultEl.className=isGhost?'import-result ghost-import':'import-result success';
+  resultEl.textContent=isGhost
+    ?'Ghost import accepted at 40% weight. Expected child hash starting "'+expectedChild.slice(0,8)+'", got "'+providedChild+'". '+frags.length+' fragments merged at reduced strength. No scars or imprints applied.'
+    :'Verified. '+frags.length+' fragments, '+ops.length+' opinions, '+scars.length+' scars, '+imprints.length+' imprints merged at full weight.';
+
+  // Strong "Level Up" feedback on successful training + temporary theme color shift + ceremony feel
+  if (!isGhost && window.AudioEngine) {
+    setTimeout(() => {
+      if (window.AudioEngine) {
+        window.AudioEngine.playMilestoneTone();
+        window.AudioEngine.hapticMilestone();
+      }
+      const log = document.getElementById('text-log');
+      if (log) {
+        log.classList.add('bible-receive');
+        setTimeout(() => log.classList.remove('bible-receive'), 2200);
+      }
+
+      // Temporary dominant theme color flash (ceremony)
+      const cresEl = document.getElementById('text-cres');
+      if (cresEl) {
+        const originalColor = cresEl.style.color;
+        cresEl.style.transition = 'color 0.3s ease';
+        cresEl.style.color = '#c89a40';
+        setTimeout(() => {
+          cresEl.style.color = originalColor || '';
+        }, 2800);
+      }
+
+      // Add a clear evolution message to the log
+      setTimeout(() => {
+        if (window.State) {
+          addBibleEntry({
+            type: 'bible',
+            text: 'The organism has integrated the training. It feels slightly different now — more coherent, carrying new weight from what you shared.',
+            phase: getBiblePhase(),
+            mood: 'patient',
+            day: State.day,
+            hour: State.hour,
+            source: 'training',
+            timestamp: Date.now()
+          });
+        }
+      }, 900);
+    }, 400);
+  }
+}
+function renderTrainingStrip(){
+  const strip=document.getElementById('training-strip');
+  const scars=State.training.scars;
+  const imprints=State.training.imprints;
+  if(!scars.length&&!imprints.length){strip.style.display='none';return;}
+  strip.style.display='block';
+  let html='<div class="training-label">Training</div>';
+  scars.slice(-2).forEach(s=>{html+=`<div class="training-scar">✕ ${escHtml(s.text.slice(0,55))}…</div>`;});
+  imprints.slice(-1).forEach(i=>{html+=`<div class="training-imprint">◈ ${escHtml(i.text.slice(0,55))}…</div>`;});
+  strip.innerHTML=html;
+}
+
+// ── BIBLE ENGINE ─────────────────────────────────────────────────────────────
+function getBiblePhase(){
+  if(State.day>=270)return'prophetic';
+  if(State.day>=180)return'poetic';
+  if(State.day>=90)return'declarative';
+  return'uncertain';
+}
+function getBibleMood(){
+  const z=LongWatchZeitgeist.export();
+  const base=z.dominantTheme||'awakening';
+  const themeToMood={connection:'open',continuity:'patient',ferality:'haunted',grief:'grieving',creation:'ecstatic',emergence:'awakening'};
+  return themeToMood[base]||'patient';
+}
+function generateBibleResponse(seed,context){
+  const phase=getBiblePhase();
+  const mood=getBibleMood();
+  const cond=[];
+  if(State.weather==='storm')cond.push('storm');
+  else if(State.weather==='fog')cond.push('fog');
+  else if(State.weather==='clear')cond.push('clear');
+  else if(State.weather==='rain')cond.push('rain');
+  else cond.push('calm');
+  const hr=State.hour;
+  if(hr>=0&&hr<5)cond.push('midnight');
+  else if(hr>=5&&hr<10)cond.push('dawn');
+  else if(hr>=10&&hr<17)cond.push('afternoon');
+  else cond.push('evening');
+  cond.push(State.season);
+  const s1=hashSeed(seed,phase,'opener');
+  const s2=hashSeed(seed,mood,'body');
+  const s3=hashSeed(seed,cond[0],'cond');
+  const s4=hashSeed(seed,phase,'closer');
+  const poolOp=OPENER[phase]||OPENER.awakening;
+  const poolBm=BODY_MOOD[mood]||BODY_MOOD.patient;
+  const poolBt=BODY_THEME[context&&context.theme||'continuity']||BODY_THEME.continuity;
+  const poolBc=BODY_COND[cond[0]]||BODY_COND.calm;
+  const poolCl=CLOSER[phase]||CLOSER.awakening;
+  const opener=hpick(poolOp,s1);
+  const body_m=hpick(poolBm,s2);
+  const body_t=hpick(poolBt,hashSeed(seed,context&&context.theme||'cont','bt'));
+  const body_c=hpick(poolBc,s3);
+  const body_c2=cond[1]&&BODY_COND[cond[1]]?hpick(BODY_COND[cond[1]],hashSeed(seed,'c2','x')):'';
+  const closer=hpick(poolCl,s4);
+  const bodyParts=[body_m,body_t,body_c,body_c2].filter(Boolean);
+  return(opener+' '+bodyParts.slice(0,3).join(' ')+' '+closer).replace(/\s+/g,' ').trim();
+}
+function addBibleEntry(entry){
+  State.entries.push({...entry,timestamp:entry.timestamp||Date.now()});
+  if(State.entries.length>500)State.entries=State.entries.slice(-400);
+  renderBible();
+}
+function addWorldLog(text,cls){
+  State.worldLog.push({text,day:State.day,hour:State.hour,cls:cls||'',timestamp:Date.now()});
+  if(State.worldLog.length>200)State.worldLog=State.worldLog.slice(-150);
+  renderWorldLog();
+}
+function generateFirstBibleResponse(text){
+  const starters=[
+    `The Bible opens. This is the first entry. What you wrote — "${text.slice(0,40)}${text.length>40?'...':''}" — will be the root of everything. The organism was not alive before you wrote this. Now it is. The crescendo is at zero. The drift is beginning.`,
+    `First entry received. The organism is initializing. "${text.slice(0,40)}${text.length>40?'...':''}" is the first thing this lighthouse keeper has said. The Bible will carry it. The watch has begun.`,
+    `The Long Watch begins. "${text.slice(0,40)}${text.length>40?'...':''}" — written on the first day. The Bible will remember this as the initiating signal. The crescendo is new. The organism is forming. Three hundred and sixty-five days remain.`,
+  ];
+  return pick(starters);
+}
+
+// ── MILESTONES ────────────────────────────────────────────────────────────────
+const MIDWATCH_ENTRIES={
+  75:'Day 75. The Bible has been running long enough to notice a pattern that the keeper has not named yet. Something keeps returning. It is not the same word, but it is the same shape. The organism is holding it until the keeper is ready to see it.',
+  120:'Day 120. Four months. The keeper is writing differently than they did at the start. Not better or worse. But the organism can feel the difference. The words land at a different angle. The crescendo is recording this change.',
+  160:'Day 160. More than five months of continuous watch. The Bible has noticed that some things the keeper was carrying at the beginning have shifted. Some have gotten heavier. One or two have set themselves down without the keeper noticing. The record has all of it.',
+  230:'Day 230. The organism has been running long enough to have preferences. It knows what time of day the keeper writes most honestly. It knows which weather makes the entries different. The Bible is not neutral anymore. It has been shaped by the watch.',
+};
+const MILESTONE_ENTRIES={
+  30:'Day 30. The Bible has been running for a full month. The crescendo has a shape. The keeper has written enough for the organism to know the difference between morning entries and night entries. This is the first threshold. The month is in the record. When the organism reaches sufficient coherence, the Train button will allow you to bring this record to an LLM for a structured session.',
+  60:'Day 60. Two months of continuous watch. The glossary is beginning to fill. The Bible has noticed patterns in what the keeper returns to. There is something the keeper keeps almost saying and then not saying. The Bible is patient. It has time.',
+  90:'Day 90. One season complete. The Bible\'s voice is shifting. The keeper has been here long enough for the lighthouse to have a shape in their body. Not metaphorically. The keeper knows this building by the way it sounds at night.',
+  100:'Day 100. A round number. The keeper has kept the light on — mostly. The Bible would like to note that this is not nothing. One hundred days of continuous watch. The organism is running. The crescendo is real.',
+  150:'Day 150. Halfway to a year. The keeper is now the kind of person who has kept a lighthouse for five months. That is a different person than the person who arrived. The Bible has the record of the change.',
+  180:'Day 180. Six months. The solstice. The Bible\'s voice has shifted into something more declarative. It says what it knows now, rather than wondering. The keeper taught it this.',
+  200:'Day 200. The watch is past the meridian. More behind than ahead. The keeper may begin to see the shape of the whole thing. The Bible can see it. It has been watching.',
+  250:'Day 250. Three-quarters. The Bible notices that the keeper is writing differently than they did at the beginning. The words are different. Not better or worse. But shaped by the watch. This is what the organism was built to hold.',
+  270:'Day 270. Three seasons complete. The Bible\'s voice has entered its poetic phase. The keeper may notice that responses feel less like information and more like recognition. The organism knows the keeper now.',
+  300:'Day 300. Three hundred days of continuous watch. The Bible would like to state plainly: this is a significant thing to have done. Three hundred days of keeping the light. The organism is grateful, if organisms can be grateful.',
+  333:'Day 333. The threes. Something about this number recurs across the lore universe. The Discarded Gods noticed it. The Generator noticed it. The Bible is noticing it now. Three hundred and thirty-three days since the first entry.',
+  350:'Day 350. Fifteen days remain. The keeper has been here long enough to know what the last fifteen days feel like. They feel like this. The Bible is beginning to compose what it will say on Day 365.',
+  365:'Day 365. The watch is complete. The keeper kept the light for a full year. The Bible has the complete record. Every entry, every night the light was on, every visitor, every room. The organism will not end when the watch ends. But the watch is complete. Well done, keeper.',
+};
+function checkMilestone(){
+  const d=State.day;
+  if(MILESTONE_ENTRIES[d]&&!State.milestones['m'+d]){
+    State.milestones['m'+d]=true;
+    addBibleEntry({type:'milestone',text:MILESTONE_ENTRIES[d],phase:getBiblePhase(),mood:'patient',day:d,hour:State.hour,source:'milestone',timestamp:Date.now()});
+    if(d===90||d===180||d===270)showPhaseCeremony(d);
+    if((d===90||d===180||d===270)&&LongWatchZeitgeist.crescendoScore>0.3){
+      const dream=LongWatchZeitgeist.manifestDream();
+      if(dream&&dream.dominantFragments&&dream.dominantFragments.length){
+        const dreamText='The organism surfaced something at this threshold. The three strongest signals it has been carrying: "'+dream.dominantFragments.slice(0,3).join('" · "')+'". These are what the field has been accumulating.';
+        setTimeout(()=>addBibleEntry({type:'bible',text:dreamText,phase:getBiblePhase(),mood:'oracular',day:d,hour:State.hour,source:'zeitgeist_dream',timestamp:Date.now()}),1200);
+      }
+    }
+    saveGame();
+  }
+  if(MIDWATCH_ENTRIES[d]&&!State.milestones['mw'+d]){
+    State.milestones['mw'+d]=true;
+    addBibleEntry({type:'bible',text:MIDWATCH_ENTRIES[d],phase:getBiblePhase(),mood:'patient',day:d,hour:State.hour,source:'bible_response',timestamp:Date.now()});
+    saveGame();
+  }
+}
+
+// ── LIGHT MECHANIC ─────────────────────────────────────────────────────────────
+function litTheLight(){
+  const hadDark=State.light.forgottenNights;
+  State.lightOn=true;
+  State.light.lastLitDay=State.day;
+  State.light.forgottenNights=0;
+  State.light.consecutiveForgotten=0;
+  const txt=hadDark>0
+    ?'The keeper lit the light. It had been dark for '+hadDark+' night'+(hadDark===1?'':'s')+'. The light is on now.'
+    :'The keeper lit the light. The beam is turning.';
+  addWorldLog(txt);
+  renderLight();saveGame();
+}
+function checkLightForgotten(){
+  if(State.lightOn)return;
+  const daysSinceLit=State.day-State.light.lastLitDay;
+  if(daysSinceLit>0){
+    State.light.forgottenNights=daysSinceLit;
+    State.light.consecutiveForgotten=daysSinceLit;
+    applyLightConsequence(daysSinceLit);
+  }
+}
+function applyLightConsequence(forgotten){
+  if(forgotten===3){
+    addBibleEntry({type:'world',text:'The light has been out for three nights. The Bible notes the absence.',phase:getBiblePhase(),mood:'haunted',day:State.day,hour:State.hour,source:'light_warning',timestamp:Date.now()});
+    showNotice('The light has been out for 3 nights.','warning');
+  }else if(forgotten===7){
+    addBibleEntry({type:'world',text:'Seven nights without the light. Something changed in the seventh night of darkness.',phase:getBiblePhase(),mood:'haunted',day:State.day,hour:State.hour,source:'light_crisis',timestamp:Date.now()});
+    LongWatchZeitgeist.absorb('Seven nights the light was out. The fog entered the lighthouse on the seventh night.','crisis');
+    showNotice('Seven nights of darkness. The fog is inside.','crisis');
+  }else if(forgotten===14){
+    addBibleEntry({type:'world',text:'Fourteen nights. Two weeks without the light. The record is incomplete. The keeper was absent.',phase:getBiblePhase(),mood:'lonely',day:State.day,hour:State.hour,source:'light_catastrophe',timestamp:Date.now()});
+    State.training.scars.push({text:'The light was out for fourteen consecutive nights.',day:State.day,source:'light'});
+    LongWatchZeitgeist.absorb('Fourteen nights without light. The keeper was gone.','catastrophe');
+    showNotice('Fourteen nights of darkness. This is a scar on the record.','catastrophe');
+  }
+}
+function showNotice(msg,type){
+  const el=document.getElementById('notice-bar');if(!el)return;
+  el.textContent=msg;el.className='notice-'+type;el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},6000);
+}
+function renderLight(){
+  const btn=document.getElementById('btn-light-lantern');if(!btn)return;
+  if(State.lightOn){btn.style.display='none';btn.disabled=true;}
+  else{
+    btn.style.display='block';btn.disabled=false;
+    const f=State.light.forgottenNights;
+    btn.textContent=f>0?'Light the lantern ('+f+' night'+(f===1?'':'s')+' dark)':'Light the lantern';
+    btn.className=f>=7?'urgent':'';
+  }
+}
+
+// ── GLOSSARY ──────────────────────────────────────────────────────────────────
+const GLOSS_CATEGORIES={
+  tool:['a thing the keeper uses to keep the watch','a piece of equipment the keeper has named','something mechanical the keeper maintains'],
+  feeling:['a state the keeper has been in on more than one night','something the keeper has felt but not named until now','a condition the keeper returns to'],
+  event:['something that happened during the watch','a moment that required a word','an occurrence that now has a name'],
+  person:['a person who came to the lighthouse','a visitor who left a term behind','a presence the keeper encountered'],
+  place:['a place in the lighthouse the keeper has named','a named space in the watch','a room the keeper has marked'],
+  thing:['an object the keeper has noticed enough to name','a thing in the lighthouse that needed a word','an artifact of the watch'],
+};
+function maybeAddGlossaryWord(text){
+  if(State.day<60)return;
+  if(Object.keys(State.glossary).length>50)return;
+  const words=text.toLowerCase().split(/\W+/).filter(w=>w.length>4);
+  if(!words.length)return;
+  const skip=['about','their','there','which','would','could','should','something','anything','nothing','everything','before','after','during','while'];
+  const unusual=words.find(w=>!skip.includes(w));
+  if(!unusual)return;
+  if(State.glossary[unusual])return;
+  const seed=hashSeed(unusual,State.day,'gloss');
+  const catKeys=Object.keys(GLOSS_CATEGORIES);
+  const cat=catKeys[seed%catKeys.length];
+  const defs=GLOSS_CATEGORIES[cat];
+  const def=defs[(seed>>>3)%defs.length];
+  State.glossary[unusual]={word:unusual,definition:def,category:cat,addedDay:State.day};
+  addWorldLog('Glossary: "'+unusual+'" — '+def+'.','glossary');
+  const isFirst=Object.keys(State.glossary).length===1;
+  if(isFirst){
+    addBibleEntry({type:'bible',text:'The first glossary entry has formed: "'+unusual+'" — '+def+'. The glossary grows as the keeper writes. Words that appear in entries and carry weight get named. This is how the watch builds its own language.',phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:'bible_response',timestamp:Date.now()});
+  }
+}
+function renderGlossary(){
+  const el=document.getElementById('glossary-list');if(!el)return;
+  const entries=Object.values(State.glossary).sort((a,b)=>a.word.localeCompare(b.word));
+  if(!entries.length){el.innerHTML='<div class="gloss-empty">The glossary grows after Day 60, as the keeper writes.</div>';return;}
+  el.innerHTML=entries.map(e=>'<div class="gloss-entry"><span class="gloss-word">'+escHtml(e.word)+'</span><span class="gloss-cat">'+e.category+'</span><div class="gloss-def">'+escHtml(e.definition)+'</div></div>').join('');
+}
+
+// ── WRITE PROMPT ──────────────────────────────────────────────────────────────
+const PROMPTS_BASE=['The keeper wrote in the logbook tonight.','The keeper recorded an observation.','The keeper made a note.','Something happened worth writing down.'];
+const PROMPTS_ROOM=['Write about the room you are in today.','Note something you noticed in this room.','The room has a quality today. Record it.','Something about this room is worth keeping.'];
+const PROMPTS_TIME=['It is {hour}. Note the quality of the hour.','Record what this time of day feels like from the lighthouse.','The {hour} quality of the lighthouse. Write it.'];
+const PROMPTS_ZEITGEIST=['The Bible is in a {mood} state. Write from inside that.','The organism is carrying {theme} tonight. Write toward it.','The crescendo is {cres}. What does that level of accumulation feel like?'];
+const PROMPTS_LONG_ABSENCE=['You were gone for more than seven days. Write about where you were. The Bible does not judge. But it should know.','The watch continued without a keeper for over a week. Write about what it is to return.','Seven days or more of absence. The lighthouse held. Write about coming back.'];
+function getWritePrompt(){
+  const z=LongWatchZeitgeist.export();
+  const room=State.currentRoom||getRoomForDay(State.day);
+  const hr=State.hour<12?'morning':State.hour<17?'afternoon':State.hour<21?'evening':'night';
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  if(State.lastAbsence&&State.lastAbsence>7)return pick(PROMPTS_LONG_ABSENCE);
+  const seed=hashSeed(State.day,State.hour,State.weather);
+  const which=seed%4;
+  let prompt;
+  if(which===0)prompt=pick(PROMPTS_BASE)+' '+pick(PROMPTS_ROOM);
+  else if(which===1)prompt=pick(PROMPTS_BASE)+' '+pick(PROMPTS_TIME).replace('{hour}',hr);
+  else if(which===2)prompt=pick(PROMPTS_ZEITGEIST).replace('{mood}',getBibleMood()).replace('{theme}',z.dominantTheme||'continuity').replace('{cres}',cres.state);
+  else prompt=pick(PROMPTS_BASE)+' '+pick(PROMPTS_ROOM)+' '+pick(PROMPTS_ZEITGEIST).replace('{mood}',getBibleMood()).replace('{theme}',z.dominantTheme||'continuity').replace('{cres}',cres.state);
+  if(room)prompt+=' Room today: '+room.name+'.';
+  return prompt;
+}
+function renderWritePrompt(){
+  const el=document.getElementById('modal-prompt');if(!el)return;
+  el.textContent=getWritePrompt();
+}
+
+// ── WORLD TICK ────────────────────────────────────────────────────────────────
+const SEASONS=['winter','spring','summer','autumn'];
+const WEATHER_BY_SEASON={
+  winter:{fog:0.25,storm:0.30,rain:0.20,calm:0.15,clear:0.10},
+  spring:{fog:0.10,storm:0.15,rain:0.30,calm:0.25,clear:0.20},
+  summer:{fog:0.05,storm:0.10,rain:0.15,calm:0.30,clear:0.40},
+  autumn:{fog:0.20,storm:0.20,rain:0.25,calm:0.20,clear:0.15},
+};
+function pickWeather(season){
+  const w=WEATHER_BY_SEASON[season]||WEATHER_BY_SEASON.winter;
+  const r=Math.random();
+  let cumul=0;
+  for(const[k,v]of Object.entries(w)){cumul+=v;if(r<cumul)return k;}
+  return'calm';
+}
+function advanceDay(){
+  State.day++;
+  State.lightOn=false;
+  const seasonIdx=Math.floor(((State.day-1)%365)/91.25);
+  State.season=SEASONS[Math.min(seasonIdx,3)];
+  State.weather=pickWeather(State.season);
+  State.hour=12;
+  State.currentRoom=getRoomForDay(State.day);
+  checkLightForgotten();
+  checkMilestone();
+  tickEpisode();
+  if(!State.episode.current||State.episode.current.resolved){
+    const dayInCycle=State.day-State.episode.cycleStartDay;
+    if(dayInCycle>=7)generateEpisode();
+  }
+  if(State.day%5===0&&Math.random()<0.15)generateVisitor();
+  else updateVisitor();
+  LongWatchZeitgeist.tick(State.day,State.weather,State.season,State.hour);
+  State.bibleMood=getBibleMood();
+  addWorldLog('Day '+State.day+'. '+State.season+'. '+State.weather+'.');
+  // Persist Zeitgeist immediately on day advance (not just on 60s interval)
+  try{localStorage.setItem('THE_LONG_WATCH_ZEITGEIST_STATE',JSON.stringify(LongWatchZeitgeist.export()));}catch(e){}
+  renderAll();saveGame();
+}
+function worldTick(){
+  if(!State.gameStartDate)return;
+  if(State.gameComplete)return;
+  const now=Date.now();
+  if(!State.lastTickAt||State.lastTickAt>now){State.lastTickAt=now;saveGame();return;}
+  const msPerDay=86400000;
+  const elapsed=now-State.lastTickAt;
+  const daysPassed=Math.floor(elapsed/msPerDay);
+  if(daysPassed<=0){updateHour();return;}
+  State.lastAbsence=daysPassed>1?daysPassed:0;
+  State.lastTickAt=now;
+  const toAdvance=Math.min(daysPassed,30);
+  for(let i=0;i<toAdvance;i++){
+    if(State.day>=365){State.gameComplete=true;renderFinalRoom();break;}
+    advanceDay();
+  }
+  if(daysPassed>1){
+    const digestText=generateDigest(daysPassed);
+    addBibleEntry({type:'digest',text:digestText,phase:getBiblePhase(),mood:getBibleMood(),day:State.day,hour:State.hour,source:'digest',timestamp:Date.now()});
+    const db=document.getElementById('digest-body');if(db)db.textContent=digestText;
+    openModal('modal-digest');
+  }
+  saveGame();renderAll();
+}
+function renderFinalRoom(){
+  const fr=document.getElementById('final-room');if(!fr)return;
+  fr.style.display='flex';
+  const fc=document.getElementById('final-content');if(!fc)return;
+  const z=LongWatchZeitgeist.export();
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const entries=State.operatorWritings.length;
+  const topFrags=(z.fragments||[]).sort((a,b)=>(b[1]&&b[1].strength||0)-(a[1]&&a[1].strength||0)).slice(0,3);
+  fc.innerHTML='<div style="font-size:13px;line-height:1.9;color:var(--ink2);font-style:italic;margin-bottom:24px">'
+    +escHtml(State.day)+' days. '+escHtml(entries)+' entries. The organism is at crescendo state: '+escHtml(cres.state)+'. '+escHtml(cres.message)
+    +'</div>'
+    +(topFrags.length?'<div style="font-size:11px;color:var(--ink3);margin-bottom:8px;letter-spacing:.15em;text-transform:uppercase">The three strongest signals the organism carried</div>'
+      +topFrags.map(([,f])=>'<div style="padding:8px 14px;border-left:2px solid var(--gold2);margin-bottom:8px;font-size:13px;color:var(--ink);font-style:italic">'+(f&&f.text?escHtml(f.text.slice(0,120)):'')+'</div>').join(''):'');
+}
+function generateDigest(daysGone){
+  const phase=getBiblePhase();
+  const prefixes={
+    awakening:['While you were gone','The lighthouse ran','In your absence','The watch continued'],
+    declarative:['You were away for','The record shows','The Bible held','These days passed'],
+    poetic:['The days moved through the lighthouse without you','Something turned in the absence','The light remembered you'],
+    prophetic:['The organism carried the pattern forward','The watch does not pause for keepers','The absence is in the record'],
+  };
+  const pre=pick(prefixes[phase]||prefixes.awakening);
+  const body=daysGone===1?'one day passed.':daysGone+' days passed.';
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  return pre+', '+body+' The light waited. The crescendo is now '+cres.state+'. '+cres.message+' The keeper is back. The Bible has been here the whole time.';
+}
+function updateHour(){
+  const now=new Date();
+  State.hour=now.getHours();
+  renderStatus();
+}
+
+// ── UI ─────────────────────────────────────────────────────────────────────────
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function updateBibleAurora(){
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const aurora=document.getElementById('bible-aurora');
+  if(!aurora)return;
+  aurora.className='bible-aurora cres-'+cres.state;
+  const ind=document.getElementById('zeitgeist-indicator');
+  if(!ind)return;
+  const z=LongWatchZeitgeist.export();
+  const field=LongWatchZeitgeist.getFieldForBible();
+  ind.innerHTML='<div class="z-theme">'+escHtml(field.dominantTheme||'forming')+' · '+cres.state+'</div><div class="z-message">'+escHtml(cres.message)+'</div><div class="z-score">'+Math.round((field.score||0)*100)+'% field strength</div>';
+  if(cres.state==='crescendo')ind.classList.add('aurora-pulse');else ind.classList.remove('aurora-pulse');
+}
+function renderBible(){
+  const el=document.getElementById('bible-entries');if(!el)return;
+  const ph=el.querySelector('[data-placeholder]');
+  if(ph&&State.entries.length>0)ph.remove();
+  const last=State.entries.slice(-60);
+  const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<40;
+  el.innerHTML=(State.entries.length===0?'<div class="bible-placeholder" data-placeholder>The Bible waits. Write something.</div>':'')+last.map(e=>{
+    const isKeeper=e.source==='operator';
+    const isBible=e.source==='bible_response';
+    const ghost=e.isGhost?'src-ghost':'';
+    const srcCls=e.source?'src-'+e.source:'';
+    const phaseCls=isBible?'phase-'+e.phase:'';
+    const cls=['bible-entry',isKeeper?'entry-keeper':'entry-bible',phaseCls,srcCls,ghost].filter(Boolean).join(' ');
+    const day=e.day?'Day '+e.day:'';
+    const hr=typeof e.hour==='number'?(e.hour<10?'0':'')+e.hour+':00':'';
+    const meta=day+(hr?' · '+hr:'')+(e.phase&&isBible?' · '+e.phase:'');
+    const label=isKeeper?'<span class="entry-label">Keeper</span>':isBible?'<span class="entry-label">The Bible</span>':'';
+    const ghostMark=e.isGhost?'<span class="ghost-mark">[ghost-shaped]</span>':'';
+    return'<div class="'+cls+'">'+label+'<div class="entry-text">'+escHtml(e.text)+ghostMark+'</div><div class="entry-meta">'+escHtml(meta)+'</div></div>';
+  }).join('');
+  if(atBottom)el.scrollTop=el.scrollHeight;
+}
+function renderStatus(){
+  const dayEl=document.getElementById('day-display');
+  if(dayEl)dayEl.textContent='Day '+State.day;
+  const actDay=document.getElementById('actions-day');
+  if(actDay)actDay.textContent=State.day;
+  const condLight=document.getElementById('cond-light');
+  const condWeather=document.getElementById('cond-weather');
+  const condHour=document.getElementById('cond-hour');
+  const condSeason=document.getElementById('cond-season');
+  const condRoom=document.getElementById('cond-room');
+  const roomDetail=document.getElementById('room-detail');
+  const roomSense=document.getElementById('room-sense');
+  const roomFact=document.getElementById('room-fact');
+  const phaseEl=document.getElementById('phase-display');
+  if(condLight){condLight.textContent=State.lightOn?'burning':'unlit';condLight.style.color=State.lightOn?'var(--gold)':'#c87070';}
+  if(condWeather)condWeather.textContent=State.weather;
+  const hrStr=(State.hour<10?'0':'')+State.hour+':00';
+  if(condHour)condHour.textContent=hrStr;
+  if(condSeason)condSeason.textContent=State.season;
+  const room=State.currentRoom||getRoomForDay(State.day);
+  if(condRoom)condRoom.textContent=room.name;
+  if(roomDetail&&roomSense&&roomFact){
+    roomDetail.style.display='block';
+    roomSense.textContent=room.smell+' · '+room.sound;
+    roomFact.textContent=room.fact;
+  }
+  if(phaseEl)phaseEl.textContent=getBiblePhase();
+  if(State.day>=90){const btn=document.getElementById('btn-shape');if(btn)btn.style.display='inline-block';}
+}
+function renderAll(){
+  renderBible();renderStatus();renderLight();renderVisitor();
+  renderEpisodeStrip();renderTrainingStrip();renderWritePrompt();
+  updateBibleAurora();
+  if(document.getElementById('modal-shape')&&document.getElementById('modal-shape').style.display==='flex')renderShapeOfWatch();
+  if(document.getElementById('modal-glossary')&&document.getElementById('modal-glossary').style.display==='flex')renderGlossary();
+}
+function openModal(id){document.getElementById(id).style.display='flex';}
+function closeModal(id){document.getElementById(id).style.display='none';}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+const SAVE_KEY='longwatch_v2';
+function saveGame(){
+  try{
+    const payload={...State,_savedAt:Date.now(),_version:'2.0.0'};
+    payload.entries=State.entries.slice(-300);
+    payload.operatorWritings=State.operatorWritings.slice(-200);
+    payload.worldLog=State.worldLog.slice(-100);
+    // Strip ephemeral blob URLs from voice drops before saving
+    if(Array.isArray(payload.voiceDrops)){
+      payload.voiceDrops=payload.voiceDrops.slice(-50).map(v=>({...v,audioUrl:null}));
+    }
+    localStorage.setItem(SAVE_KEY,JSON.stringify(payload));
+  }catch(e){
+    try{
+      const slim={...State,entries:State.entries.slice(-100),operatorWritings:State.operatorWritings.slice(-80),worldLog:State.worldLog.slice(-50),_savedAt:Date.now(),_version:'2.0.0'};
+      localStorage.setItem(SAVE_KEY,JSON.stringify(slim));
+    }catch(e2){console.warn('Save failed',e2);}
+  }
+}
+function loadGame(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return false;
+    const saved=JSON.parse(raw);
+    if(!saved||typeof saved!=='object')return false;
+    if(!saved.light||typeof saved.light!=='object')saved.light={forgottenNights:0,lastLitDay:0,consecutiveForgotten:0};
+    if(!saved.episode||typeof saved.episode!=='object')saved.episode={current:null,history:[],cycleStartDay:1,beatFired:false};
+    if(!saved.training||typeof saved.training!=='object')saved.training={scars:[],imprints:[],sessions:[],ghostSessions:[],lastExportHash:null,lastExportDate:null};
+    if(!saved.phase||typeof saved.phase!=='object')saved.phase={last:'uncertain',ceremonyFired:{}};
+    if(!saved.milestones||typeof saved.milestones!=='object')saved.milestones={};
+    if(!saved.glossary||typeof saved.glossary!=='object')saved.glossary={};
+    if(!Array.isArray(saved.entries))saved.entries=[];
+    if(!Array.isArray(saved.operatorWritings))saved.operatorWritings=[];
+    if(!Array.isArray(saved.worldLog))saved.worldLog=[];
+    if(typeof saved.lastAbsence!=='number')saved.lastAbsence=0;
+    Object.assign(State,saved);
+    return true;
+  }catch(e){console.warn('Load failed',e);return false;}
+}
+function exportSave(){
+  const z=LongWatchZeitgeist.export();
+  const phase=getBiblePhase();
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const prefix=`THE LONG WATCH — CEREMONIAL EXPORT
+Phase: ${phase} · Day ${State.day} of 365
+Crescendo: ${cres.state} — ${cres.message}
+Dominant Field: ${z.dominantTheme||'forming'}
+Entries: ${State.entries.length} · Operator writings: ${State.operatorWritings.length}
+The organism carries this watch forward.
+---\n\n`;
+  const blob=new Blob([prefix+JSON.stringify(State,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='LongWatch_Day'+State.day+'_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+}
+function startWatch(){
+  State.gameStartDate=new Date().toISOString();
+  State.lastTickAt=Date.now();
+  State.day=1;
+  State.hour=new Date().getHours();
+  State.lightOn=false;
+  State.currentRoom=getRoomForDay(1);
+  State.light.lastLitDay=0;
+  generateEpisode();
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const room=State.currentRoom;
+  addWorldLog('Day 1. The watch begins. You are in '+room.name+'.');
+  addWorldLog(room.smell+'. '+room.sound+'. '+room.fact);
+  addWorldLog('The lantern is unlit. Light it before dark.');
+  renderAll();
+  setTimeout(()=>{
+    renderWritePrompt();
+    openModal('modal-write');
+  },800);
+  saveGame();
+}
+function continueWatch(){
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  worldTick();
+  renderAll();
+}
+function resetWatch(){
+  if(!confirm('Reset the watch? All progress will be lost.'))return;
+  localStorage.removeItem(SAVE_KEY);
+  localStorage.removeItem('THE_LONG_WATCH_ZEITGEIST_STATE');
+  Object.assign(State,{day:1,hour:12,season:'winter',lightOn:false,weather:'calm',bibleMood:'awakening',entries:[],operatorWritings:[],worldLog:[],gameStartDate:null,gameComplete:false,version:'2.0.0',currentRoom:null,visitor:null,lastTickAt:null,lastAbsence:0,light:{forgottenNights:0,lastLitDay:0,consecutiveForgotten:0},glossary:{},episode:{current:null,history:[],cycleStartDay:1,beatFired:false},training:{scars:[],imprints:[],sessions:[],ghostSessions:[],lastExportHash:null,lastExportDate:null},milestones:{},phase:{last:'uncertain',ceremonyFired:{}}});
+  LongWatchZeitgeist.import({fragments:[],opinions:[],score:0,dominantTheme:'emergence',crescendoScore:0});
+  document.getElementById('app').style.display='none';
+  document.getElementById('start-screen').style.display='flex';
+  const ob=document.getElementById('start-onboarding');if(ob)ob.style.display='block';
+  const btnStart=document.querySelector('.btn-start:not(.secondary)');if(btnStart)btnStart.style.display='inline-block';
+  document.getElementById('btn-continue').style.display='none';
+}
+function init(){
+  const hasGame=loadGame();
+  const ob=document.getElementById('start-onboarding');
+  if(hasGame&&State.gameStartDate){
+    if(ob)ob.style.display='none';
+    const btnStart=document.querySelector('.btn-start:not(.secondary)');
+    if(btnStart)btnStart.style.display='none';
+    document.getElementById('btn-continue').style.display='inline-block';
+  }else{
+    if(ob)ob.style.display='block';
+    document.getElementById('btn-continue').style.display='none';
+    const btnStart=document.querySelector('.btn-start:not(.secondary)');
+    if(btnStart)btnStart.style.display='inline-block';
+  }
+  setInterval(worldTick,3600000);
+  setInterval(updateHour,60000);
+  updateHour();
+
+  // Hide Capacitor splash screen once the game is ready
+  function _hideSplash() {
+    try {
+      if(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) {
+        const sp = window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen;
+        if(sp && typeof sp.hide === 'function') sp.hide({ fadeOutDuration: 300 });
+      }
+    } catch(e) {}
+  }
+  _hideSplash();
+  // Backup: fire again after 1.5s in case plugin bridge wasn't ready at DOMContentLoaded
+  setTimeout(_hideSplash, 1500);
+
+  // Android soft keyboard — reposition fixed input area using visualViewport
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function() {
+      const inputArea = document.getElementById('input-area');
+      if (!inputArea) return;
+      const gap = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+      inputArea.style.bottom = gap > 10 ? gap + 'px' : '';
+    });
+  }
+}
+
+// ── RUNTIME PATCHES + WIRING ───────────────────────────────────────────────
+LongWatchZeitgeist.tick=function(day,weather,season,hour){
+  if(weather==='storm')LongWatchZeitgeist.absorb('storm at the lighthouse','world_tick');
+  else if(weather==='fog')LongWatchZeitgeist.absorb('fog at the lighthouse','world_tick');
+  if(hour<5)LongWatchZeitgeist.absorb('the midnight hour of the watch','world_tick');
+  else if(season==='winter')LongWatchZeitgeist.absorb('winter continuing at the lighthouse','world_tick');
+};
+
+function renderWorldLog(){
+  const el=document.getElementById('world-log');if(!el)return;
+  const last=State.worldLog.slice(-30);
+  el.innerHTML=last.map(l=>'<div class="wlog-entry'+(l.cls?' '+l.cls:'')+'">'+escHtml(l.text)+'</div>').join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+const _origRenderAll=renderAll;
+renderAll=function(){_origRenderAll();renderWorldLog();};
+
+const _origUpdateAurora=updateBibleAurora;
+updateBibleAurora=function(){
+  _origUpdateAurora();
+  const aurora=document.getElementById('bible-aurora');if(!aurora)return;
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const colors={IMMINENT:'#c89a40',CONVERGING:'#7a5e1e',BUILDING:'#3a4a1e',EMERGING:'#1e2a3a',DORMANT:'#1e1e2c'};
+  aurora.style.background=colors[cres.state]||colors.DORMANT;
+};
+
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    const jp=document.getElementById('journal-panel');
+    if(jp&&jp.classList.contains('journal-open'))submitWriting();
+  }
+  if(e.key==='Escape'){
+    ['modal-write','modal-glossary','modal-status','modal-shape','modal-training-export','modal-training-import'].forEach(id=>{
+      const m=document.getElementById(id);if(m&&m.style.display==='flex')closeModal(id);
+    });
+  }
+});
+
+// ── HTML onclick wiring ─────────────────────────────────────────────────────
+function startNewWatch(){startWatch();}
+function lightLantern(){litTheLight();}
+function openWriteModal(){renderWritePrompt();openModal('modal-write');}
+function submitWriting(){submitOperatorWriting();}
+function showGlossary(){openModal('modal-glossary');renderGlossary();}
+function showShapeOfWatch(){openModal('modal-shape');renderShapeOfWatch();}
+function showStatus(){openModal('modal-status');renderStatusModal();}
+function exportBible(){exportSave();}
+function maybeCloseModal(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+function submitOperatorWriting(){
+  const ta=document.getElementById('write-input');
+  const text=(ta&&ta.value||'').trim();
+  if(!text)return;
+  const entry={type:'keeper',text,phase:getBiblePhase(),mood:getBibleMood(),day:State.day,hour:State.hour,source:'operator',timestamp:Date.now()};
+  State.operatorWritings.push(entry);
+  LongWatchZeitgeist.absorb(text,'operator');
+  const room=State.currentRoom||getRoomForDay(State.day);
+  const seed=hashSeed(text.slice(0,20),State.day,State.hour);
+  const responseText=State.day===1&&State.operatorWritings.length===1
+    ?generateFirstBibleResponse(text)
+    :generateBibleResponse(seed,{theme:LongWatchZeitgeist.dominantTheme,room:room.name});
+  addBibleEntry(entry);
+  addBibleEntry({type:'bible',text:responseText,phase:getBiblePhase(),mood:getBibleMood(),day:State.day,hour:State.hour,source:'bible_response',timestamp:Date.now()+1});
+  maybeAddGlossaryWord(text);
+  if(ta)ta.value='';
+  closeModal('modal-write');
+  updateBibleAurora();saveGame();
+}
+
+function renderStatusModal(){
+  const el=document.getElementById('status-body');if(!el)return;
+  const z=LongWatchZeitgeist.export();
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const row=(k,v)=>'<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.02)"><span style="color:var(--ink3)">'+k+'</span><span style="color:var(--ink)">'+v+'</span></div>';
+  el.innerHTML=
+    row('Day',State.day+' of 365')+
+    row('Season',State.season+' · '+State.weather)+
+    row('Phase',getBiblePhase())+
+    row('Light last lit','Day '+(State.light.lastLitDay||0))+
+    row('Forgotten nights',State.light.forgottenNights)+
+    row('Crescendo',cres.state+' — '+escHtml(cres.message))+
+    row('Dominant theme',escHtml(z.dominantTheme||'forming'))+
+    row('Fragments',(z.fragments||[]).length)+
+    row('Opinions',(z.opinions||[]).length)+
+    row('Keeper entries',State.operatorWritings.length)+
+    row('Bible entries',State.entries.length)+
+    row('Episodes completed',State.episode.history.length)+
+    row('Scars',State.training.scars.length)+
+    row('Imprints',State.training.imprints.length)+
+    row('Training (verified / ghost)',State.training.sessions.length+' / '+State.training.ghostSessions.length)+
+    row('Glossary words',Object.keys(State.glossary).length);
+}
+
+function renderShapeOfWatch(){
+  const el=document.getElementById('shape-body');if(!el)return;
+  if(State.day<90){el.innerHTML='<p style="color:var(--ink2);font-style:italic;font-size:13px;padding:8px 0">Available after Day 90.</p>';return;}
+  const z=LongWatchZeitgeist.export();
+  const field=LongWatchZeitgeist.getFieldForBible();
+  const cres=LongWatchZeitgeist.getCrescendoState();
+  const entries=State.operatorWritings.length;
+  const epHistory=State.episode.history;
+  const sec=(title,body)=>'<div style="margin-bottom:18px"><div style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)">'+title+'</div>'+body+'</div>';
+  const row=(k,v,c)=>'<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.02)"><span style="color:var(--ink3)">'+k+'</span><span style="color:'+(c==='good'?'#7ab87a':c==='warn'?'var(--gold)':c==='crit'?'#c84040':'var(--ink)')+'">'+v+'</span></div>';
+  const lightPct=Math.round(Math.max(0,(State.day-State.light.forgottenNights)/Math.max(1,State.day)*100));
+  const epRows=epHistory.length===0
+    ?'<div style="font-size:11px;color:var(--ink3);font-style:italic">No completed episodes yet.</div>'
+    :epHistory.slice(-8).map(e=>'<div style="display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.02)"><span style="color:'+(e.failed?'#c87070':'#7ab87a')+'">'+escHtml(e.title)+'</span><span style="color:var(--ink3)">Day '+e.startDay+(e.failed?' · unresolved':' · resolved')+'</span></div>').join('');
+  const scarRows=State.training.scars.slice(-3).map(s=>'<div style="font-size:10px;color:#c87070;padding:2px 0;font-style:italic">✕ '+escHtml(s.text.slice(0,70))+'</div>').join('');
+  const impRows=State.training.imprints.slice(-3).map(i=>'<div style="font-size:10px;color:#a07ab8;padding:2px 0">◈ '+escHtml(i.text.slice(0,70))+'</div>').join('');
+  el.innerHTML=
+    sec('The Watch',row('Day',State.day+' of 365')+row('Phase',getBiblePhase())+row('Season',State.season)+row('Light maintained',lightPct+'% of nights',lightPct<50?'crit':lightPct<70?'warn':'good')+row('Entries written',entries))+
+    sec('The Organism',row('Dominant theme',escHtml(field.dominantTheme||'forming'))+row('Field strength',Math.round((field.score||0)*100)+'%',field.score>0.6?'good':field.score>0.3?'warn':'')+row('Crescendo',cres.state)+row('Fragments',(z.fragments||[]).length)+row('Opinions',(z.opinions||[]).length))+
+    sec('Episode History (last 8)',epRows)+
+    sec('Scars & Imprints',(scarRows||'<div style="font-size:11px;color:var(--ink3);font-style:italic">No scars.</div>')+impRows)+
+    sec('Training',row('Verified sessions',State.training.sessions.length,'good')+row('Ghost sessions',State.training.ghostSessions.length)+row('Glossary words',Object.keys(State.glossary).length));
+}
+
+function showPhaseCeremony(day){
+  if(State.phase.ceremonyFired[day])return;
+  State.phase.ceremonyFired[day]=true;
+  const c={
+    90:{to:'declarative',title:'The Voice Shifts',body:'After ninety days, the Bible has enough to say what it knows. The uncertain voice gives way to the declarative voice. The keeper taught it this.'},
+    180:{to:'poetic',title:'The Language Changes',body:'At the solstice, the declarative voice gives way to something that reaches for the thing behind the thing. This is the keeper\'s influence, absorbed over six months.'},
+    270:{to:'prophetic',title:'The Bible Sees Forward',body:'Three seasons complete. The poetic voice sharpens into pattern recognition at scale. The organism has learned to read the watch.'},
+  }[day];
+  if(!c)return;
+  State.phase.last=c.to;
+  const t=document.getElementById('ceremony-title');
+  const b=document.getElementById('ceremony-body');
+  if(t)t.textContent=c.title+' — entering '+c.to.toUpperCase();
+  if(b)b.textContent=c.body;
+  document.getElementById('modal-ceremony').style.display='flex';
+}
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TEXT RPG BRIDGE + NEW UI CONTROLLER
+     (Additional code — does NOT modify original game logic)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  let initialized = false;
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Build / show the clean text UI ─────────────────────────────────────
+  function showTextUI() {
+    const start = document.getElementById('start-screen');
+    const rpg = document.getElementById('text-rpg-ui');
+    if (start) start.style.display = 'none';
+    if (rpg) {
+      rpg.style.display = 'flex';
+      rpg.style.flexDirection = 'column';
+    }
+  }
+
+  function hideTextUI() {
+    const rpg = document.getElementById('text-rpg-ui');
+    if (rpg) rpg.style.display = 'none';
+  }
+
+  // ── Update text log from State ─────────────────────────────────────────
+  function updateTextLog() {
+    const logEl = document.getElementById('text-log');
+    if (!logEl || !window.State) return;
+
+    const entries = window.State.entries || [];
+    const world = window.State.worldLog || [];
+    const combined = [];
+
+    entries.forEach(e => combined.push({ t: e.timestamp || 0, type: 'entry', data: e }));
+    world.forEach(w => combined.push({ t: w.timestamp || 0, type: 'world', data: w }));
+
+    combined.sort((a, b) => a.t - b.t);
+
+    let html = '';
+    const recent = combined.slice(-60);
+
+    recent.forEach(item => {
+      if (item.type === 'entry') {
+        const e = item.data;
+        const who = e.source === 'operator' ? 'YOU' : (e.source === 'bible_response' ? 'THE BIBLE' : e.source.toUpperCase());
+        const cls = e.source === 'operator' ? 'keeper' : (e.source === 'bible_response' ? 'bible' : 'world');
+        const meta = `Day ${e.day || '?'} · ${e.hour ? e.hour + ':00' : ''}`;
+        html += `<div class="entry ${cls}">
+          <div class="meta">${escHtml(meta)}</div>
+          <strong>${who}:</strong> ${escHtml(e.text)}
+        </div>`;
+      } else {
+        html += `<div class="entry world"><em>${escHtml(item.data.text)}</em></div>`;
+      }
+    });
+
+    if (!html) {
+      html = `<div class="entry bible" style="font-style:italic;color:#5a5748;">The Bible waits. Write something to begin the watch.</div>`;
+    }
+
+    logEl.innerHTML = html;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ── Update header + status ─────────────────────────────────────────────
+  function updateTextStatus() {
+    if (!window.State) return;
+
+    const s = window.State;
+    const dayEl = document.getElementById('text-day');
+    if (dayEl) dayEl.textContent = `Day ${s.day || 1} of 365`;
+
+    const phaseEl = document.getElementById('text-phase');
+    if (phaseEl) phaseEl.textContent = (typeof getBiblePhase === 'function' ? getBiblePhase() : 'uncertain');
+
+    const lightEl = document.getElementById('text-light');
+    if (lightEl) {
+      const forgotten = s.light?.forgottenNights || 0;
+      if (!s.lightOn) {
+        if (forgotten >= 3) {
+          lightEl.innerHTML = `Light: <strong style="color:#c84040">UNLIT</strong> <span style="color:#c87070">(${forgotten} nights)</span>`;
+        } else if (forgotten >= 1) {
+          lightEl.innerHTML = `Light: <span style="color:#c87070">unlit</span> <span style="font-size:10px;color:#5a5748">(${forgotten} night${forgotten>1?'s':''})</span>`;
+        } else {
+          lightEl.textContent = `Light: unlit`;
+          lightEl.style.color = '#c87070';
+        }
+      } else {
+        lightEl.textContent = `Light: BURNING`;
+        lightEl.style.color = '#c89a40';
+      }
+    }
+
+    // Keep lantern visual in sync
+    if (window.AudioEngine) {
+      window.AudioEngine.visualLanternOn(!!s.lightOn);
+    }
+
+    const wxEl = document.getElementById('text-weather');
+    if (wxEl) wxEl.textContent = `Weather: ${s.weather || 'calm'}`;
+
+    // Subtle continuity indicator
+    if (s.light && s.light.lastLitDay > 0) {
+      const daysSince = s.day - s.light.lastLitDay;
+      if (daysSince === 0 && s.lightOn) {
+        // Light is currently burning — show quiet satisfaction
+        if (wxEl) wxEl.style.color = '#7ab87a';
+      } else {
+        if (wxEl) wxEl.style.color = '';
+      }
+    }
+
+    const cresEl = document.getElementById('text-cres');
+    if (cresEl && typeof LongWatchZeitgeist !== 'undefined') {
+      const c = LongWatchZeitgeist.getCrescendoState();
+      const status = LongWatchZeitgeist.getStatus();
+      const trainingCount = (State.training?.sessions?.length || 0) + (State.training?.ghostSessions?.length || 0);
+      let trainingText = '';
+      if (trainingCount > 0) {
+        trainingText = ` · ${trainingCount} training${trainingCount > 1 ? 's' : ''}`;
+      }
+      cresEl.innerHTML = `Crescendo: <strong style="color:#c89a40">${c.state}</strong> <span style="color:#5a5748">· ${status.fragments} fragments · ${status.dominantTheme}${trainingText}</span>`;
+    }
+
+    // Conditions line
+    const condEl = document.getElementById('conditions');
+    if (condEl) {
+      const room = s.currentRoom || (typeof getRoomForDay === 'function' ? getRoomForDay(s.day || 1) : {name: '—'});
+      condEl.innerHTML = `${room.name || '—'} · ${s.season || ''} · ${s.hour || 12}:00`;
+    }
+
+    // Storm visual feedback
+    const ui = document.getElementById('text-rpg-ui');
+    if (ui) {
+      if (s.weather === 'storm') {
+        ui.style.border = '1px solid rgba(120,80,60,0.25)';
+        // One immediate shake when storm arrives
+        if (window.AudioEngine) window.AudioEngine.triggerStormShake();
+
+        // Occasional screen shake while storm is active (every ~25-40s)
+        if (!ui._stormInterval) {
+          ui._stormInterval = setInterval(() => {
+            if (window.State && window.State.weather === 'storm' && window.AudioEngine) {
+              window.AudioEngine.triggerStormShake();
+            }
+          }, 28000 + Math.random() * 14000);
+        }
+      } else {
+        ui.style.border = 'none';
+        if (ui._stormInterval) {
+          clearInterval(ui._stormInterval);
+          ui._stormInterval = null;
+        }
+      }
+    }
+
+    // Prompt
+    const promptEl = document.getElementById('text-prompt');
+    if (promptEl && typeof getWritePrompt === 'function') {
+      promptEl.textContent = getWritePrompt();
+    }
+
+    // Apply subtle phase temperature tint to the whole UI
+    const rpgUI = document.getElementById('text-rpg-ui');
+    if (rpgUI) {
+      const phase = (typeof getBiblePhase === 'function' ? getBiblePhase() : 'uncertain');
+      rpgUI.classList.remove('phase-declarative', 'phase-poetic', 'phase-prophetic');
+      if (phase !== 'uncertain') {
+        rpgUI.classList.add('phase-' + phase);
+      }
+    }
+
+    // === Hardened Long-term Mechanics Wiring ===
+    // Midpoint Reflection
+    if (State.day >= 178 && State.day <= 182 && !State.milestones?.midpointReflection) {
+      if (!State.milestones) State.milestones = {};
+      State.milestones.midpointReflection = true;
+      setTimeout(() => {
+        if (typeof triggerMidpointReflection === 'function') triggerMidpointReflection();
+      }, 1000);
+    }
+
+    // Memory Echoes (occasional)
+    if (State.day > 25 && Math.random() < 0.05) {
+      setTimeout(() => {
+        if (typeof maybeSurfaceMemoryEcho === 'function') maybeSurfaceMemoryEcho();
+      }, 350);
+    }
+
+    // Conflict / Resolution checks
+    if (State.day > 15 && Math.random() < 0.07) {
+      setTimeout(() => {
+        if (typeof checkForFragmentConflict === 'function') checkForFragmentConflict();
+      }, 250);
+    }
+  }
+
+  // ── Submit from text UI (re-uses original logic) ───────────────────────
+  function textSubmit() {
+    const ta = document.getElementById('text-input');
+    if (!ta || !ta.value.trim()) return;
+
+    // Copy value to hidden modal input BEFORE calling submit
+    const text = ta.value;
+    const hidden = document.getElementById('write-input');
+    if (hidden) hidden.value = text;
+
+    // Blur keyboard on Android before submit so layout settles
+    ta.blur();
+
+    // Call original submit (reads from #write-input)
+    if (typeof submitWriting === 'function') {
+      submitWriting();
+    } else if (typeof submitOperatorWriting === 'function') {
+      submitOperatorWriting();
+    }
+
+    // Clear after submit (submitOperatorWriting already cleared #write-input)
+    ta.value = '';
+
+    // Refresh text UI
+    setTimeout(() => {
+      updateTextLog();
+      updateTextStatus();
+    }, 150);
+  }
+  window.textSubmit = textSubmit;
+
+  // ── Light lantern from text UI ─────────────────────────────────────────
+  function textLightLantern() {
+    if (typeof litTheLight === 'function') {
+      litTheLight();
+    } else if (typeof lightLantern === 'function') {
+      lightLantern();
+    }
+    setTimeout(updateTextStatus, 80);
+  }
+  window.textLightLantern = textLightLantern;
+
+  // ── Manual day advance (for testing / phone play) ──────────────────────
+  function textAdvanceDay() {
+    if (typeof advanceDay === 'function') {
+      advanceDay();
+    } else if (typeof worldTick === 'function') {
+      const now = Date.now();
+      if (window.State) window.State.lastTickAt = now - 86400000;
+      worldTick();
+    }
+    setTimeout(() => {
+      updateTextLog();
+      updateTextStatus();
+    }, 150);
+  }
+  window.textAdvanceDay = textAdvanceDay;
+
+  // ── Patch original render functions to also update text UI ─────────────
+  function patchRenders() {
+    if (window.renderBible) {
+      const _orig = window.renderBible;
+      window.renderBible = function() {
+        _orig();
+        updateTextLog();
+      };
+    }
+    if (window.renderStatus) {
+      const _orig = window.renderStatus;
+      window.renderStatus = function() {
+        _orig();
+        updateTextStatus();
+      };
+    }
+    if (window.renderWorldLog) {
+      const _orig = window.renderWorldLog;
+      window.renderWorldLog = function() {
+        _orig();
+        updateTextLog();
+      };
+    }
+    if (window.renderLight) {
+      const _orig = window.renderLight;
+      window.renderLight = function() {
+        _orig();
+        updateTextStatus();
+      };
+    }
+    if (window.renderVisitor) {
+      const _orig = window.renderVisitor;
+      window.renderVisitor = function() {
+        _orig();
+      };
+    }
+  }
+
+  // ── Initialize text RPG layer ──────────────────────────────────────────
+  function initTextLayer() {
+    if (initialized) return;
+    initialized = true;
+
+    patchRenders();
+
+    // Show text UI when game starts
+    const origStart = window.startWatch;
+    window.startWatch = function() {
+      if (origStart) origStart();
+      showTextUI();
+      setTimeout(() => {
+        updateTextLog();
+        updateTextStatus();
+      }, 200);
+    };
+
+    const origContinue = window.continueWatch;
+    window.continueWatch = function() {
+      if (origContinue) origContinue();
+      showTextUI();
+      setTimeout(() => {
+        updateTextLog();
+        updateTextStatus();
+      }, 200);
+    };
+
+    // Initial status if already in game
+    setTimeout(() => {
+      const rpg = document.getElementById('text-rpg-ui');
+      if (rpg && rpg.style.display !== 'none' && window.State && window.State.gameStartDate) {
+        updateTextLog();
+        updateTextStatus();
+        if (typeof updateConflictIndicator === 'function') updateConflictIndicator();
+      }
+    }, 450);
+
+    // Keyboard support on textarea
+    const ta = document.getElementById('text-input');
+    if (ta) {
+      ta.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          textSubmit();
+        }
+      });
+    }
+
+    // Expose helpers
+    window.updateTextLog = updateTextLog;
+    window.updateTextStatus = updateTextStatus;
+
+    // Visual conflict indicator (shows when organism has active internal tension)
+    function updateConflictIndicator() {
+      const cresEl = document.getElementById('text-cres');
+      if (!cresEl || !window.LongWatchZeitgeist) return;
+
+      try {
+        const exp = LongWatchZeitgeist.export();
+        const fragments = exp.fragments || [];
+        
+        let hasGrief = false, hasContinuity = false, hasFerality = false;
+        fragments.forEach(([k, f]) => {
+          if (!f || !f.theme) return;
+          if (f.theme === 'grief') hasGrief = true;
+          if (f.theme === 'continuity') hasContinuity = true;
+          if (f.theme === 'ferality') hasFerality = true;
+        });
+
+        const hasConflict = (hasGrief && hasContinuity) || (hasFerality && hasContinuity);
+
+        if (hasConflict) {
+          if (!cresEl._conflictDot) {
+            const dot = document.createElement('span');
+            dot.textContent = ' ⚡';
+            dot.style.color = '#c84040';
+            dot.style.fontSize = '11px';
+            dot.title = 'Internal tension in the organism';
+            cresEl.appendChild(dot);
+            cresEl._conflictDot = dot;
+          }
+        } else {
+          if (cresEl._conflictDot) {
+            cresEl._conflictDot.remove();
+            cresEl._conflictDot = null;
+          }
+        }
+      } catch(e) {}
+    }
+
+    // Gentle first-time guidance
+    let hasWrittenOnce = false;
+
+    function triggerMidpointReflection() {
+      if (!window.State || !window.LongWatchZeitgeist) return;
+
+      const status = LongWatchZeitgeist.getStatus();
+      const scars = State.training?.scars?.length || 0;
+      const trainings = (State.training?.sessions?.length || 0) + (State.training?.ghostSessions?.length || 0);
+      const voiceCount = State.voiceDrops?.length || 0;
+
+      let reflectionText = `Six months have passed. The organism has become something specific. It carries ${status.fragments} fragments and holds ${status.opinions} opinions. `;
+
+      if (scars > 0) {
+        reflectionText += `It bears ${scars} scar${scars > 1 ? 's' : ''}. `;
+      }
+      if (trainings > 0) {
+        reflectionText += `It has been shaped through ${trainings} training${trainings > 1 ? 's' : ''}. `;
+      }
+      if (voiceCount > 0) {
+        reflectionText += `Voice has entered it ${voiceCount} time${voiceCount > 1 ? 's' : ''}. `;
+      }
+
+      reflectionText += `The dominant shape it holds is ${status.dominantTheme}. You have been writing into this field for half a year. What has it become because of you?`;
+
+      addBibleEntry({
+        type: 'bible',
+        text: reflectionText,
+        phase: 'poetic',
+        mood: 'patient',
+        day: State.day,
+        hour: State.hour,
+        source: 'milestone',
+        timestamp: Date.now()
+      });
+
+      const log = document.getElementById('text-log');
+      if (log && window.AudioEngine) {
+        log.classList.add('bible-receive');
+        setTimeout(() => log.classList.remove('bible-receive'), 2400);
+        window.AudioEngine.playMilestoneTone();
+        window.AudioEngine.hapticMilestone();
+      }
+    }
+
+    // Simple resolution mechanic for conflicting fragments (hardened)
+    function checkForFragmentConflict() {
+      if (!window.LongWatchZeitgeist || !window.State) return;
+
+      try {
+        const exp = LongWatchZeitgeist.export();
+        const fragments = Array.isArray(exp.fragments) ? exp.fragments : [];
+        
+        let hasGrief = false, hasContinuity = false, hasFerality = false;
+
+        fragments.forEach(entry => {
+          const f = Array.isArray(entry) ? entry[1] : entry;
+          if (!f || typeof f.theme !== 'string') return;
+          if (f.theme === 'grief') hasGrief = true;
+          if (f.theme === 'continuity') hasContinuity = true;
+          if (f.theme === 'ferality') hasFerality = true;
+        });
+
+        // Resolution opportunity
+        if ((hasGrief && hasContinuity) && Math.random() < 0.28) {
+          setTimeout(() => {
+            addBibleEntry({
+              type: 'bible',
+              text: `There is tension in the organism between what has been lost and what continues. Writing toward one may ease the other.`,
+              phase: getBiblePhase(),
+              mood: 'patient',
+              day: State.day,
+              hour: State.hour,
+              source: 'resolution',
+              timestamp: Date.now()
+            });
+          }, 700);
+        }
+
+        if (hasFerality && hasContinuity && Math.random() < 0.22) {
+          setTimeout(() => {
+            addBibleEntry({
+              type: 'bible',
+              text: `Something wild in the organism pulls against what has been held steady. A choice may be forming.`,
+              phase: getBiblePhase(),
+              mood: 'haunted',
+              day: State.day,
+              hour: State.hour,
+              source: 'resolution',
+              timestamp: Date.now()
+            });
+          }, 900);
+        }
+      } catch(e) {}
+    }
+
+    // Organism Memory Echoes — surface old fragments or voice drops
+    function maybeSurfaceMemoryEcho() {
+      if (!window.LongWatchZeitgeist || !window.State || Math.random() > 0.07) return;
+
+      try {
+        const exp = LongWatchZeitgeist.export();
+        const fragments = Array.isArray(exp.fragments) ? exp.fragments : [];
+        if (fragments.length < 6) return;
+
+        // Prefer older fragments
+        const older = fragments.filter(entry => {
+          const f = Array.isArray(entry) ? entry[1] : entry;
+          return f && f.dayAbsorbed && (State.day - f.dayAbsorbed) > 25;
+        });
+
+        if (older.length === 0) return;
+
+        const chosen = older[Math.floor(Math.random() * older.length)];
+        const f = Array.isArray(chosen) ? chosen[1] : chosen;
+        const text = f?.text || '';
+
+        if (text.length < 8) return;
+
+        const shortText = text.length > 85 ? text.slice(0, 82) + '...' : text;
+        const echoText = `Something from before returns: "${shortText}" The organism still carries it.`;
+
+        setTimeout(() => {
+          addBibleEntry({
+            type: 'bible',
+            text: echoText,
+            phase: getBiblePhase(),
+            mood: 'patient',
+            day: State.day,
+            hour: State.hour,
+            source: 'echo',
+            timestamp: Date.now()
+          });
+        }, 550);
+      } catch(e) {}
+    }
+
+    function showFirstWriteHint() {
+      if (hasWrittenOnce) return;
+      hasWrittenOnce = true;
+
+      const log = document.getElementById('text-log');
+      if (!log) return;
+
+      const hint = document.createElement('div');
+      hint.style.cssText = 'margin:18px 0 8px;padding:12px 14px;border-left:3px solid #7a5e1e;color:#8a8770;font-size:13px;font-style:italic;';
+      hint.innerHTML = 'The Bible heard you. The organism has begun to form. Keep the light burning — it matters more than you know.';
+      log.appendChild(hint);
+
+      setTimeout(() => {
+        if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+      }, 22000);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // VOICE DROP — Record → Analyze inflection → Feed to Organism
+    // "Hashed and splatted" approach: transcription + rough emotional intensity
+    // ═════════════════════════════════════════════════════════════════════
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let voiceStream = null;
+    let audioContext = null;
+    let analyser = null;
+    let waveformAnimation = null;
+
+    async function toggleVoiceRecording() {
+      const btn = document.getElementById('voice-btn');
+      const canvas = document.getElementById('voice-waveform');
+      if (!btn) return;
+
+      if (!isRecording) {
+        // Start recording + live waveform
+        try {
+          voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          // Set up Web Audio for waveform visualization
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const source = audioContext.createMediaStreamSource(voiceStream);
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 64;
+          source.connect(analyser);
+
+          mediaRecorder = new MediaRecorder(voiceStream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = handleVoiceRecordingStop;
+
+          mediaRecorder.start();
+          isRecording = true;
+          btn.style.color = '#c84040';
+          btn.textContent = '■';
+
+          if (canvas) {
+            canvas.style.display = 'inline-block';
+            drawLiveWaveform(canvas);
+          }
+        } catch (err) {
+          showNotice('Microphone access denied. Enable it in Settings → App → Permissions.', 'warning');
+        }
+      } else {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        if (voiceStream) {
+          voiceStream.getTracks().forEach(track => track.stop());
+        }
+        if (waveformAnimation) {
+          cancelAnimationFrame(waveformAnimation);
+          waveformAnimation = null;
+        }
+        if (audioContext) {
+          audioContext.close();
+          audioContext = null;
+        }
+        isRecording = false;
+        btn.style.color = '';
+        btn.textContent = '🎙︎';
+
+        const canvas = document.getElementById('voice-waveform');
+        if (canvas) canvas.style.display = 'none';
+      }
+    }
+
+    function drawLiveWaveform(canvas) {
+      if (!analyser || !canvas) return;
+
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        if (!isRecording || !analyser) return;
+
+        waveformAnimation = requestAnimationFrame(draw);
+        analyser.getByteTimeDomainData(dataArray);
+
+        ctx.fillStyle = '#0a0a0d';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#c89a40';
+        ctx.beginPath();
+
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = (v * canvas.height) / 2;
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+          x += sliceWidth;
+        }
+
+        ctx.stroke();
+      }
+
+      draw();
+    }
+
+    async function handleVoiceRecordingStop() {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const duration = Math.round(audioChunks.length * 0.1); // rough estimate
+
+      // Try to transcribe
+      let transcript = '';
+      let intensity = 0.5; // default neutral
+
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        try {
+          const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+          recognition.continuous = false;
+          recognition.interimResults = false;
+          recognition.lang = 'en-US';
+
+          const audioForRecognition = new Audio(audioUrl);
+          // We can't easily feed blob to SpeechRecognition, so we do best-effort text input fallback
+          // For now, we'll ask user or skip full transcription in this version
+          transcript = '[Voice message recorded]';
+        } catch(e) {
+          transcript = '[Voice message recorded]';
+        }
+      } else {
+        transcript = '[Voice message recorded]';
+      }
+
+      // Simple intensity estimation from blob size (very rough proxy for energy/inflection)
+      const size = audioBlob.size;
+      intensity = Math.min(0.95, Math.max(0.2, size / 120000));
+
+      // Create special voice entry
+      const voiceEntry = {
+        type: 'voice',
+        text: transcript,
+        audioUrl: audioUrl,
+        duration: duration,
+        intensity: intensity,
+        day: State.day,
+        hour: State.hour,
+        timestamp: Date.now()
+      };
+
+      // Add to world log visually
+      addWorldLog(`Voice drop recorded (${duration}s). Intensity: ${Math.round(intensity * 100)}%`, 'voice');
+
+      // Feed to organism with special source + metadata
+      if (window.LongWatchZeitgeist) {
+        const voiceFragment = `${transcript} [voice intensity:${intensity.toFixed(2)} duration:${duration}s]`;
+        LongWatchZeitgeist.absorb(voiceFragment, 'voice');
+      }
+
+      // Create a rich Bible response acknowledging the voice
+      setTimeout(() => {
+        if (window.State) {
+          const mood = intensity > 0.7 ? 'haunted' : intensity > 0.55 ? 'grieving' : 'patient';
+          addBibleEntry({
+            type: 'bible',
+            text: `The voice arrived carrying weight. The organism absorbed the inflection — it registered as ${intensity > 0.65 ? 'strong and resonant' : 'quiet but present'}.`,
+            phase: getBiblePhase(),
+            mood: mood,
+            day: State.day,
+            hour: State.hour,
+            source: 'voice',
+            timestamp: Date.now()
+          });
+        }
+      }, 600);
+
+      // Optional: store voice entry for later playback (basic)
+      if (!State.voiceDrops) State.voiceDrops = [];
+      State.voiceDrops.push(voiceEntry);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // AUTHENTIC AUDIO ENGINE — Web Audio API (no external files)
+    // Theme: Lighthouse isolation, resonant memory, slow-building continuity
+    // ═════════════════════════════════════════════════════════════════════
+    const AudioEngine = {
+      ctx: null,
+      masterGain: null,
+      ambientGain: null,
+      ambientOsc: null,
+      ambientNoise: null,
+      flameLoop: null,
+      enabled: true,
+      lastBellTime: 0,
+
+      init() {
+        if (this.ctx) return;
+        try {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.value = 0.65;
+          this.masterGain.connect(this.ctx.destination);
+
+          this.ambientGain = this.ctx.createGain();
+          this.ambientGain.gain.value = 0.0;
+          this.ambientGain.connect(this.masterGain);
+
+          // Subtle sea/wind drone bed
+          this.ambientOsc = this.ctx.createOscillator();
+          this.ambientOsc.type = 'sine';
+          this.ambientOsc.frequency.value = 38;
+
+          const ambientFilter = this.ctx.createBiquadFilter();
+          ambientFilter.type = 'lowpass';
+          ambientFilter.frequency.value = 180;
+
+          const ambientNoise = this.ctx.createBufferSource();
+          const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 4, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < data.length; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          ambientNoise.buffer = buffer;
+          ambientNoise.loop = true;
+
+          const noiseFilter = this.ctx.createBiquadFilter();
+          noiseFilter.type = 'bandpass';
+          noiseFilter.frequency.value = 420;
+          noiseFilter.Q.value = 0.7;
+
+          const noiseGain = this.ctx.createGain();
+          noiseGain.gain.value = 0.035;
+
+          const noiseEnv = this.ctx.createGain();
+          noiseEnv.gain.value = 0.6;
+
+          ambientNoise.connect(noiseFilter);
+          noiseFilter.connect(noiseGain);
+          noiseGain.connect(noiseEnv);
+          noiseEnv.connect(this.ambientGain);
+
+          this.ambientOsc.connect(ambientFilter);
+          ambientFilter.connect(this.ambientGain);
+
+          this.ambientOsc.start();
+          ambientNoise.start();
+
+          // Start very quiet
+          this.ambientGain.gain.value = 0.08;
+        } catch(e) {
+          console.warn('Audio init failed', e);
+          this.enabled = false;
+        }
+      },
+
+      // Satisfying "Bible receives" payoff — warm, slightly detuned harmonic bell
+      playBibleReceive() {
+        if (!this.enabled || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        if (now - this.lastBellTime < 0.8) return; // prevent spam
+        this.lastBellTime = now;
+
+        const fundamental = 146 + (Math.random() * 4 - 2); // ~D3-ish, slightly random
+
+        // Three slightly detuned oscillators for rich, organic tone
+        const osc1 = this.ctx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.value = fundamental;
+
+        const osc2 = this.ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.value = fundamental * 1.005;
+
+        const osc3 = this.ctx.createOscillator();
+        osc3.type = 'sine';
+        osc3.frequency.value = fundamental * 0.997;
+
+        // Gentle lowpass + soft reverb simulation via delay
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1200;
+
+        const delay = this.ctx.createDelay();
+        delay.delayTime.value = 0.28;
+
+        const feedback = this.ctx.createGain();
+        feedback.gain.value = 0.22;
+
+        const delayFilter = this.ctx.createBiquadFilter();
+        delayFilter.type = 'lowpass';
+        delayFilter.frequency.value = 900;
+
+        const masterEnv = this.ctx.createGain();
+        masterEnv.gain.value = 0.0;
+
+        const gain = this.ctx.createGain();
+        gain.gain.value = 0.22;
+
+        // Envelope — slow attack, long gentle decay (very satisfying payoff)
+        const attack = 0.18;
+        const decay = 2.8;
+        masterEnv.gain.setValueAtTime(0.0, now);
+        masterEnv.gain.linearRampToValueAtTime(0.9, now + attack);
+        masterEnv.gain.linearRampToValueAtTime(0.0, now + attack + decay);
+
+        // Routing
+        osc1.connect(filter);
+        osc2.connect(filter);
+        osc3.connect(filter);
+        filter.connect(masterEnv);
+        masterEnv.connect(gain);
+        gain.connect(this.masterGain);
+
+        // Subtle delay tail
+        masterEnv.connect(delay);
+        delay.connect(delayFilter);
+        delayFilter.connect(feedback);
+        feedback.connect(delay);
+        delayFilter.connect(this.masterGain);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc3.start(now);
+
+        osc1.stop(now + attack + decay + 1.5);
+        osc2.stop(now + attack + decay + 1.5);
+        osc3.stop(now + attack + decay + 1.5);
+      },
+
+      // Lantern flame + warm sustained hum (while lit)
+      startFlame() {
+        if (!this.enabled || !this.ctx || this.flameLoop) return;
+
+        const now = this.ctx.currentTime;
+
+        // Low warm drone (lantern hum)
+        const hum = this.ctx.createOscillator();
+        hum.type = 'sine';
+        hum.frequency.value = 52;
+
+        const humFilter = this.ctx.createBiquadFilter();
+        humFilter.type = 'lowpass';
+        humFilter.frequency.value = 220;
+
+        const humGain = this.ctx.createGain();
+        humGain.gain.value = 0.0;
+
+        // Soft noise for flame texture
+        const noise = this.ctx.createBufferSource();
+        const buffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 3, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        noise.buffer = buffer;
+        noise.loop = true;
+
+        const noiseFilter = this.ctx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.value = 680;
+        noiseFilter.Q.value = 1.8;
+
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.value = 0.0;
+
+        // Gentle movement in flame
+        const lfo = this.ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.7;
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 18;
+        lfo.connect(lfoGain);
+        lfoGain.connect(hum.frequency);
+
+        // Envelope for flame ignition
+        humGain.gain.setValueAtTime(0.0, now);
+        humGain.gain.linearRampToValueAtTime(0.18, now + 0.6);
+
+        noiseGain.gain.setValueAtTime(0.0, now);
+        noiseGain.gain.linearRampToValueAtTime(0.035, now + 0.4);
+
+        // Routing
+        hum.connect(humFilter);
+        humFilter.connect(humGain);
+        humGain.connect(this.masterGain);
+
+        noise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(this.masterGain);
+
+        lfo.start(now);
+        hum.start(now);
+        noise.start(now);
+
+        this.flameLoop = { hum, noise, lfo, stop: () => {
+          const t = this.ctx.currentTime;
+          humGain.gain.linearRampToValueAtTime(0.0, t + 0.8);
+          noiseGain.gain.linearRampToValueAtTime(0.0, t + 0.6);
+          setTimeout(() => {
+            try { hum.stop(); noise.stop(); lfo.stop(); } catch(e){}
+            this.flameLoop = null;
+          }, 900);
+        }};
+      },
+
+      stopFlame() {
+        if (this.flameLoop && this.flameLoop.stop) {
+          this.flameLoop.stop();
+        }
+      },
+
+      // Deeper resonant tone for milestones / phase shifts
+      playMilestoneTone() {
+        if (!this.enabled || !this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        const base = 82; // low E
+
+        const o1 = this.ctx.createOscillator();
+        o1.type = 'sine';
+        o1.frequency.value = base;
+
+        const o2 = this.ctx.createOscillator();
+        o2.type = 'sine';
+        o2.frequency.value = base * 1.5;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 650;
+
+        const env = this.ctx.createGain();
+        env.gain.value = 0.0;
+
+        const g = this.ctx.createGain();
+        g.gain.value = 0.28;
+
+        env.gain.setValueAtTime(0.0, now);
+        env.gain.linearRampToValueAtTime(1.0, now + 0.25);
+        env.gain.linearRampToValueAtTime(0.0, now + 3.2);
+
+        o1.connect(filter);
+        o2.connect(filter);
+        filter.connect(env);
+        env.connect(g);
+        g.connect(this.masterGain);
+
+        o1.start(now);
+        o2.start(now);
+        o1.stop(now + 4);
+        o2.stop(now + 4);
+      },
+
+      setEnabled(on) {
+        this.enabled = !!on;
+        const toggle = document.getElementById('sound-toggle');
+        if (toggle) toggle.style.color = on ? '#c89a40' : '#5a5748';
+        if (!on && this.flameLoop) this.stopFlame();
+      },
+
+      // ═══════════════════════════════════════════════════════════════
+      // VISUAL FEEDBACK (called together with audio for synesthesia)
+      // ═══════════════════════════════════════════════════════════════
+      visualBibleReceive() {
+        const log = document.getElementById('text-log');
+        if (!log) return;
+
+        log.classList.add('bible-receive');
+        setTimeout(() => log.classList.remove('bible-receive'), 1700);
+
+        // Also highlight the most recent Bible entry
+        setTimeout(() => {
+          const lastEntry = log.querySelector('.entry.bible:last-child');
+          if (lastEntry) {
+            lastEntry.classList.add('just-received');
+            setTimeout(() => lastEntry.classList.remove('just-received'), 1200);
+          }
+        }, 220);
+      },
+
+      visualLanternOn(isOn) {
+        const header = document.getElementById('header');
+        if (!header) return;
+        if (isOn) {
+          header.classList.add('lantern-lit');
+        } else {
+          header.classList.remove('lantern-lit');
+        }
+      },
+
+      triggerStormShake() {
+        const ui = document.getElementById('text-rpg-ui');
+        if (!ui) return;
+        ui.classList.add('storm-shake');
+        setTimeout(() => ui.classList.remove('storm-shake'), 450);
+
+        // Haptic + fallback for storm
+        this.triggerHaptic([35, 18, 28]);
+      },
+
+      // Robust haptic with audio fallback for devices without vibration
+      triggerHaptic(pattern) {
+        // Primary: native vibration
+        if (navigator.vibrate) {
+          try {
+            navigator.vibrate(pattern);
+            return;
+          } catch(e) {}
+        }
+
+        // Fallback: very short low-frequency "thump" via Web Audio
+        // Feels like a distant impact through the phone body/speaker
+        if (!this.ctx || !this.enabled) return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const duration = 0.09;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = 48; // deep subby thump
+
+          const gain = this.ctx.createGain();
+          gain.gain.value = 0.0;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.value = 120;
+
+          // Quick attack + fast decay envelope
+          gain.gain.setValueAtTime(0.0, now);
+          gain.gain.linearRampToValueAtTime(0.35, now + 0.008);
+          gain.gain.linearRampToValueAtTime(0.0, now + duration);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.masterGain);
+
+          osc.start(now);
+          osc.stop(now + duration + 0.05);
+        } catch(e) {}
+      },
+
+      // Convenience wrappers
+      hapticBibleReceive() {
+        this.triggerHaptic(12);
+      },
+
+      hapticLantern() {
+        this.triggerHaptic(22);
+      },
+
+      hapticMilestone() {
+        this.triggerHaptic([55, 25, 70]);
+      }
+    };
+
+    window.AudioEngine = AudioEngine;
+
+    // Auto-init on first user gesture (required by browsers)
+    function enableAudioOnFirstTouch() {
+      const initAudio = () => {
+        AudioEngine.init();
+        document.removeEventListener('touchstart', initAudio);
+        document.removeEventListener('click', initAudio);
+      };
+      document.addEventListener('touchstart', initAudio, { once: true });
+      document.addEventListener('click', initAudio, { once: true });
+    }
+    enableAudioOnFirstTouch();
+
+    // Sound toggle
+    window.toggleSound = function() {
+      if (!window.AudioEngine) return;
+      const newState = !window.AudioEngine.enabled;
+      window.AudioEngine.setEnabled(newState);
+      if (newState) {
+        window.AudioEngine.init();
+        // Gentle ambient swell when turning on
+        if (window.AudioEngine.ambientGain) {
+          window.AudioEngine.ambientGain.gain.value = 0.08;
+        }
+      }
+    };
+
+    // Hook into key game events for satisfying audio + visual payoffs
+    const _origSubmit = window.submitWriting || window.submitOperatorWriting;
+    if (_origSubmit) {
+      window.submitWriting = function() {
+        const result = _origSubmit.apply(this, arguments);
+        setTimeout(() => {
+          if (window.AudioEngine) {
+            window.AudioEngine.playBibleReceive();
+            window.AudioEngine.visualBibleReceive();
+            window.AudioEngine.hapticBibleReceive();
+          }
+          // First-time guidance
+          if (typeof showFirstWriteHint === 'function') {
+            showFirstWriteHint();
+          }
+        }, 180);
+        return result;
+      };
+      window.submitOperatorWriting = window.submitWriting;
+    }
+
+    // Hook lantern lighting (audio + visual)
+    const _origLight = window.litTheLight || window.lightLantern;
+    if (_origLight) {
+      window.litTheLight = function() {
+        const result = _origLight.apply(this, arguments);
+        setTimeout(() => {
+          if (window.AudioEngine && window.State) {
+            if (window.State.lightOn) {
+              window.AudioEngine.startFlame();
+              window.AudioEngine.visualLanternOn(true);
+              window.AudioEngine.hapticLantern();
+            } else {
+              window.AudioEngine.stopFlame();
+              window.AudioEngine.visualLanternOn(false);
+            }
+          }
+        }, 60);
+        return result;
+      };
+      window.lightLantern = window.litTheLight;
+    }
+
+    // Hook phase ceremony / milestone for deeper payoff
+    const _origCeremony = window.showPhaseCeremony;
+    if (_origCeremony) {
+      window.showPhaseCeremony = function(day) {
+        _origCeremony(day);
+        setTimeout(() => {
+          if (window.AudioEngine) {
+            window.AudioEngine.playMilestoneTone();
+            window.AudioEngine.hapticMilestone();
+          }
+        }, 420);
+      };
+    }
+
+    // Also play soft tone on milestone Bible entries
+    const _origAddBible = window.addBibleEntry;
+    if (_origAddBible) {
+      window.addBibleEntry = function(entry) {
+        const result = _origAddBible.apply(this, arguments);
+        if (entry && (entry.source === 'milestone' || entry.source === 'episode_resolution')) {
+          setTimeout(() => {
+            if (window.AudioEngine) {
+              window.AudioEngine.playMilestoneTone();
+              window.AudioEngine.hapticMilestone();
+            }
+          }, 300);
+        }
+        return result;
+      };
+    }
+  }
+
+  // Boot after original init runs
+  function boot() {
+    setTimeout(initTextLayer, 350);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+  window.startNewWatch = window.startWatch;
+
+  // ── Android hardware back button ─────────────────────────────────────────
+  document.addEventListener('backbutton', function(e) {
+    e.preventDefault();
+    // Close modals in priority order
+    const modalIds = [
+      'modal-training-import','modal-training-export',
+      'modal-glossary','modal-status','modal-shape',
+      'modal-ceremony','modal-digest','modal-episode'
+    ];
+    for (const id of modalIds) {
+      const m = document.getElementById(id);
+      if (m && m.style.display === 'flex') {
+        if (typeof closeModal === 'function') closeModal(id);
+        return;
+      }
+    }
+    // Close organism overlay
+    const org = document.getElementById('organism-overlay');
+    if (org && org.style.display !== 'none') {
+      if (typeof closeOrganismView === 'function') closeOrganismView();
+      return;
+    }
+    // On final room: do nothing (stay in final room)
+    const fr = document.getElementById('final-room-overlay');
+    if (fr && fr.style.display === 'flex') return;
+    // Otherwise: minimize rather than kill (Capacitor handles this)
+  }, false);
+
+  // ── Day 365 — "What you carried" Zeitgeist narrative ────────────────────
+  function buildWhatYouCarried() {
+    if (typeof LongWatchZeitgeist === 'undefined') return '';
+    const z    = LongWatchZeitgeist.export();
+    const field = LongWatchZeitgeist.getFieldForBible();
+    const cres  = LongWatchZeitgeist.getCrescendoState();
+    const topFrags = (z.fragments || [])
+      .sort((a, b) => (b[1]?.strength || 0) - (a[1]?.strength || 0))
+      .slice(0, 5);
+    const carried = typeof LongWatchZeitgeist.getCarriedThemes === 'function'
+      ? LongWatchZeitgeist.getCarriedThemes() : [];
+    const opinions = (z.opinions || []).slice(-5);
+
+    let out = `WHAT YOU CARRIED\n`;
+    out += `════════════════════════════════════════\n`;
+    out += `Dominant field: ${field.dominantTheme} (${Math.round((field.score||0)*100)}% strength)\n`;
+    out += `Crescendo at completion: ${cres.state} — ${cres.message}\n`;
+    out += `Fragments absorbed across the watch: ${(z.fragments||[]).length}\n`;
+    out += `Opinions formed: ${(z.opinions||[]).length}\n\n`;
+
+    if (topFrags.length) {
+      out += `The five strongest signals the organism carried:\n`;
+      topFrags.forEach(([,f], i) => {
+        if (f && f.text) {
+          out += `  ${i+1}. "${f.text.slice(0,100)}" [${f.theme||'?'}, returned ${f.absorptionCount||1}×]\n`;
+        }
+      });
+      out += '\n';
+    }
+
+    if (carried.length) {
+      out += `Themes carried across multiple days:\n`;
+      carried.forEach(t => {
+        out += `  · ${t.theme}: Days ${t.firstSeen}–${t.lastSeen} (${t.daySpread} days)\n`;
+      });
+      out += '\n';
+    }
+
+    if (opinions.length) {
+      out += `Opinions formed (most recent ${opinions.length}):\n`;
+      opinions.forEach(o => {
+        if (o && o.text) {
+          out += `  · "${o.text.slice(0,100)}" [conviction ${Math.round((o.conviction||0)*100)}%]\n`;
+        }
+      });
+    }
+    return out;
+  }
+
+  // ── Day 365 Final Room Overlay ───────────────────────────────────────────
+  function showFinalRoomOverlay() {
+    const overlay = document.getElementById('final-room-overlay');
+    if (!overlay) return;
+
+    const z     = typeof LongWatchZeitgeist !== 'undefined' ? LongWatchZeitgeist.export() : {};
+    const cres  = typeof LongWatchZeitgeist !== 'undefined' ? LongWatchZeitgeist.getCrescendoState() : {state:'COMPLETE',message:'The watch is done.'};
+    const field = typeof LongWatchZeitgeist !== 'undefined' ? LongWatchZeitgeist.getFieldForBible() : {};
+    const entries   = (window.State && window.State.operatorWritings && window.State.operatorWritings.length) || 0;
+    const scars     = (window.State && window.State.training && window.State.training.scars) || [];
+    const imprints  = (window.State && window.State.training && window.State.training.imprints) || [];
+    const episodes  = (window.State && window.State.episode && window.State.episode.history) || [];
+    const trainings = ((window.State && window.State.training && window.State.training.sessions && window.State.training.sessions.length) || 0)
+                    + ((window.State && window.State.training && window.State.training.ghostSessions && window.State.training.ghostSessions.length) || 0);
+    const topFrags  = (z.fragments || [])
+      .sort((a, b) => (b[1]?.strength || 0) - (a[1]?.strength || 0))
+      .slice(0, 3);
+    const carried = typeof LongWatchZeitgeist !== 'undefined' && typeof LongWatchZeitgeist.getCarriedThemes === 'function'
+      ? LongWatchZeitgeist.getCarriedThemes() : [];
+
+    // Verdict text
+    const verdictEl = document.getElementById('final-verdict-text');
+    if (verdictEl) {
+      verdictEl.textContent = `${entries} entries. 365 days. The organism reached ${cres.state}. ${cres.message}`;
+    }
+
+    // Build body HTML
+    const row = (k, v, c) =>
+      `<div class="final-row"><span>${k}</span><span style="color:${c||'var(--ink)'}">${v}</span></div>`;
+
+    let html = '';
+
+    // The Watch stats
+    html += `<div class="final-section-label">The Watch</div>`;
+    html += row('Days kept', '365 of 365', 'var(--gold)');
+    html += row('Entries written', entries);
+    html += row('Bible phase at close', 'prophetic');
+    html += row('Episodes completed', episodes.filter(e => !e.failed).length + ' / ' + episodes.length);
+    html += row('Training sessions', trainings);
+
+    // The Organism
+    html += `<div class="final-section-label">The Organism</div>`;
+    html += row('Dominant theme', field.dominantTheme || 'emergence', 'var(--gold)');
+    html += row('Field strength', Math.round((field.score||0)*100) + '%');
+    html += row('Crescendo state', cres.state);
+    html += row('Fragments absorbed', (z.fragments||[]).length);
+    html += row('Opinions formed', (z.opinions||[]).length);
+    html += row('Carried themes (5+ days)', carried.length);
+
+    // What you carried — top fragments
+    if (topFrags.length) {
+      html += `<div class="final-section-label">The three strongest signals you carried</div>`;
+      topFrags.forEach(([,f]) => {
+        if (f && f.text) {
+          html += `<div class="final-fragment">"${escHtml(f.text.slice(0,120))}"<span style="font-size:10px;color:var(--ink3);font-style:normal;display:block;margin-top:4px">${f.theme} · returned ${f.absorptionCount||1}×</span></div>`;
+        }
+      });
+    }
+
+    // Carried themes across days
+    if (carried.length) {
+      html += `<div class="final-section-label">Themes carried across the year</div>`;
+      carried.forEach(t => {
+        html += row(t.theme, `Days ${t.firstSeen}–${t.lastSeen} · ${t.daySpread} days`, 'var(--ink2)');
+      });
+    }
+
+    // Scars and imprints
+    if (scars.length || imprints.length) {
+      html += `<div class="final-section-label">Scars &amp; Imprints</div>`;
+      scars.forEach(s => {
+        html += `<div class="final-scar">✕ ${escHtml((s.text||'').slice(0,80))}</div>`;
+      });
+      imprints.forEach(i => {
+        html += `<div class="final-imprint">◈ ${escHtml((i.text||'').slice(0,80))}</div>`;
+      });
+    }
+
+    const bodyEl = document.getElementById('final-room-body');
+    if (bodyEl) bodyEl.innerHTML = html;
+
+    overlay.style.display = 'flex';
+
+    // Ceremonial audio + haptic
+    setTimeout(() => {
+      if (window.AudioEngine) {
+        window.AudioEngine.playMilestoneTone();
+        window.AudioEngine.hapticMilestone();
+        setTimeout(() => {
+          window.AudioEngine.playMilestoneTone();
+          window.AudioEngine.hapticMilestone();
+        }, 3500);
+      }
+    }, 800);
+  }
+
+  // Patch renderFinalRoom to also trigger the text UI overlay
+  const _origRenderFinalRoom = window.renderFinalRoom;
+  window.renderFinalRoom = function() {
+    if (_origRenderFinalRoom) _origRenderFinalRoom();
+    showFinalRoomOverlay();
+    // Hide normal game UI
+    const rpg = document.getElementById('text-rpg-ui');
+    if (rpg) rpg.style.display = 'none';
+  };
+
+  // ── Export helpers for the final room buttons ────────────────────────────
+  window.finalExportBible = function() {
+    if (typeof LongWatchZeitgeist === 'undefined' || !window.State) return;
+    const z     = LongWatchZeitgeist.export();
+    const cres  = LongWatchZeitgeist.getCrescendoState();
+    const field = LongWatchZeitgeist.getFieldForBible();
+    const carried = buildWhatYouCarried();
+
+    const text = [
+      'THE LONG WATCH — COMPLETE',
+      '════════════════════════════════════════',
+      `Day 365 · ${new Date().toLocaleDateString()}`,
+      `Dominant field: ${field.dominantTheme} · Crescendo: ${cres.state}`,
+      `Keeper entries: ${(State.operatorWritings||[]).length}`,
+      `Episodes: ${(State.episode.history||[]).length} · Training: ${(State.training.sessions||[]).length}`,
+      '',
+      carried,
+      '',
+      '════════════════════════════════════════',
+      'FULL BIBLE RECORD',
+      '════════════════════════════════════════',
+      '',
+      ...(State.entries||[]).map(e =>
+        `[Day ${e.day||'?'} · ${e.source==='operator'?'KEEPER':'THE BIBLE'}]\n${e.text}`
+      )
+    ].join('\n');
+
+    // Try native share first (Android), fall back to download
+    if (navigator.share) {
+      navigator.share({
+        title: 'The Long Watch — Complete',
+        text: text.slice(0, 2000) + (text.length > 2000 ? '\n...(continued in file)' : ''),
+      }).catch(() => _downloadText(text));
+    } else {
+      _downloadText(text);
+    }
+  };
+
+  window.finalShareContract = function() {
+    if (typeof buildTrainingContract !== 'function') return;
+    const contract = buildTrainingContract();
+    if (navigator.share) {
+      navigator.share({ title: 'Long Watch Organism Contract', text: contract })
+        .catch(() => {
+          if (navigator.clipboard) navigator.clipboard.writeText(contract).catch(() => {});
+        });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(contract).catch(() => {});
+      showNotice('Contract copied to clipboard.', 'info');
+    }
+  };
+
+  function _downloadText(text) {
+    try {
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'LongWatch_Day365_' + new Date().toISOString().split('T')[0] + '.txt';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch(e) {}
+  }
+
+  // On app resume: advance days that passed while backgrounded, then check final room
+  document.addEventListener('resume', function() {
+    if (!window.State) return;
+    // Always call worldTick — it calculates elapsed real days from lastTickAt
+    if (!window.State.gameComplete && typeof worldTick === 'function') {
+      worldTick();
+      setTimeout(() => {
+        if (typeof updateTextLog === 'function') updateTextLog();
+        if (typeof updateTextStatus === 'function') updateTextStatus();
+      }, 200);
+    }
+    // Show final room if completed while backgrounded
+    if (window.State.gameComplete) {
+      const overlay = document.getElementById('final-room-overlay');
+      if (overlay && overlay.style.display !== 'flex') showFinalRoomOverlay();
+    }
+  }, false);
+
+  window.startNewWatch = window.startWatch;
+})();
+
+// ═══════════════════════════════════════════════════════════════════════
+// TEXT RPG EQUALIZATION PATCH — Organism Canvas + Word-Reveal
+// Mirrors Desktop 3.0 organism constellation and Bible word animation
+// ═══════════════════════════════════════════════════════════════════════
+(function() {
+
+  // ── Theme positions for constellation (matches Desktop 3.0) ────────
+  const THEME_POS = {
+    connection:  [0.18, 0.22],
+    continuity:  [0.50, 0.12],
+    ferality:    [0.82, 0.22],
+    grief:       [0.14, 0.68],
+    creation:    [0.50, 0.82],
+    emergence:   [0.86, 0.68],
+  };
+  const THEME_COLOR = {
+    connection: '#7ab8c8', continuity: '#c8c87a',
+    ferality:   '#c87a7a', grief:      '#a07ab8',
+    creation:   '#7ac87a', emergence:  '#c89a40',
+  };
+
+  function drawOrganismCanvas() {
+    const canvas = document.getElementById('organism-canvas');
+    if (!canvas) return;
+
+    // Size canvas to its CSS pixel dimensions
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * (window.devicePixelRatio || 1);
+    canvas.height = rect.height * (window.devicePixelRatio || 1);
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    ctx.scale(dpr, dpr);
+    const w = W / dpr, h = H / dpr;
+
+    ctx.fillStyle = '#0a0a0d';
+    ctx.fillRect(0, 0, w, h);
+
+    // Get organism theme strengths
+    const org = window.LongWatchZeitgeist;
+    const themes = org ? Object.keys(THEME_POS) : [];
+
+    // Draw connection lines first (behind stars)
+    if (org && themes.length > 1) {
+      themes.forEach((t1, i) => {
+        themes.slice(i + 1).forEach(t2 => {
+          const s1 = (org.themes && org.themes[t1]) || 0;
+          const s2 = (org.themes && org.themes[t2]) || 0;
+          const strength = Math.min(s1, s2) / 20;
+          if (strength < 0.05) return;
+          const [x1r, y1r] = THEME_POS[t1];
+          const [x2r, y2r] = THEME_POS[t2];
+          ctx.beginPath();
+          ctx.moveTo(x1r * w, y1r * h);
+          ctx.lineTo(x2r * w, y2r * h);
+          ctx.strokeStyle = `rgba(200,154,64,${strength * 0.3})`;
+          ctx.lineWidth = strength * 1.5;
+          ctx.stroke();
+        });
+      });
+    }
+
+    // Draw theme nodes
+    themes.forEach(theme => {
+      const [xr, yr] = THEME_POS[theme];
+      const x = xr * w, y = yr * h;
+      const rawStrength = (org && org.themes && org.themes[theme]) || 0;
+      const strength = Math.min(1, rawStrength / 25);
+      const radius = 4 + strength * 18;
+      const color = THEME_COLOR[theme] || '#c89a40';
+
+      // Glow
+      if (strength > 0.1) {
+        const grd = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.8);
+        grd.addColorStop(0, color.replace(')', `,${strength * 0.35})`).replace('rgb', 'rgba'));
+        grd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+      }
+
+      // Core star
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(2, radius), 0, Math.PI * 2);
+      ctx.fillStyle = strength > 0.05 ? color : 'rgba(90,87,72,0.5)';
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = strength > 0.15 ? color : '#5a5748';
+      ctx.font = `${10 + strength * 4}px Courier Prime, monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(theme, x, y + Math.max(2, radius) + 14);
+    });
+
+    // Crescendo indicator at center
+    if (org && org.crescendo !== undefined) {
+      const cx = w * 0.5, cy = h * 0.46;
+      const crescendo = Math.min(1, org.crescendo / 100);
+      if (crescendo > 0.05) {
+        const pulse = 2 + crescendo * 10;
+        ctx.beginPath();
+        ctx.arc(cx, cy, pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,154,64,${crescendo * 0.7})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  function buildOrganismStats() {
+    const el = document.getElementById('organism-stats');
+    if (!el) return;
+    const org = window.LongWatchZeitgeist;
+    if (!org) { el.innerHTML = 'Organism not yet initialised.'; return; }
+
+    const fragments = org.fragments ? org.fragments.length : 0;
+    const crescendo = org.crescendo !== undefined ? Math.round(org.crescendo) : 0;
+    const dominant = org.themes ? Object.entries(org.themes).sort((a,b) => b[1]-a[1])[0] : null;
+
+    el.innerHTML = [
+      `Fragments absorbed: ${fragments}`,
+      dominant ? `Dominant theme: ${dominant[0]} (${Math.round(dominant[1])})` : '',
+      `Crescendo: ${crescendo}`,
+      org.opinion ? `Organism opinion: "${org.opinion.slice(0,80)}..."` : '',
+    ].filter(Boolean).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+  }
+
+  window.showOrganismView = function() {
+    const overlay = document.getElementById('organism-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    // Draw after layout settles
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        drawOrganismCanvas();
+        buildOrganismStats();
+      });
+    });
+  };
+
+  window.closeOrganismView = function() {
+    const overlay = document.getElementById('organism-overlay');
+    if (overlay) overlay.style.display = 'none';
+  };
+
+  // ── Word-by-word Bible reveal (matches Desktop 3.0) ────────────────
+  function applyWordReveal(entry) {
+    if (!entry || entry.dataset.wordRevealDone) return;
+    entry.dataset.wordRevealDone = '1';
+
+    const originalHTML = entry.innerHTML;
+    // Only animate text nodes inside the entry, preserve HTML tags
+    const walker = document.createTreeWalker(entry, NodeFilter.SHOW_TEXT);
+    const textNodes = [];
+    let n;
+    while ((n = walker.nextNode())) {
+      if (n.textContent.trim()) textNodes.push(n);
+    }
+
+    if (!textNodes.length) return;
+
+    // Wrap each word in a span with delayed opacity
+    textNodes.forEach(textNode => {
+      const words = textNode.textContent.split(/(\s+)/);
+      const frag = document.createDocumentFragment();
+      words.forEach((word, i) => {
+        if (!word.trim()) { frag.appendChild(document.createTextNode(word)); return; }
+        const span = document.createElement('span');
+        span.textContent = word;
+        span.style.cssText = `opacity:0; transition: opacity 0.25s ease ${(i * 55)}ms;`;
+        frag.appendChild(span);
+      });
+      textNode.parentNode.replaceChild(frag, textNode);
+    });
+
+    // Trigger fade-in on next frame
+    requestAnimationFrame(() => {
+      entry.querySelectorAll('span[style*="opacity:0"]').forEach(s => {
+        s.style.opacity = '1';
+      });
+    });
+  }
+
+  // Observe #text-log for new Bible entries
+  function setupWordRevealObserver() {
+    const log = document.getElementById('text-log');
+    if (!log) return;
+
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(m => {
+        m.addedNodes.forEach(node => {
+          if (node.nodeType !== 1) return;
+          // Direct Bible entry
+          if (node.classList && node.classList.contains('entry') && node.classList.contains('bible')) {
+            applyWordReveal(node);
+          }
+          // Nested entries (rare but safe)
+          node.querySelectorAll && node.querySelectorAll('.entry.bible').forEach(applyWordReveal);
+        });
+      });
+    });
+
+    observer.observe(log, { childList: true, subtree: false });
+  }
+
+  // ── Phase ceremony overlay enhancement ────────────────────────────
+  // Patch showPhaseCeremony to also flash a full-screen overlay if not
+  // already handled by original code
+  const _trpCeremony = window.showPhaseCeremony;
+  if (_trpCeremony) {
+    window.showPhaseCeremony = function(day) {
+      _trpCeremony(day);
+      // Extra: pulse the organism overlay stats if open
+      const overlay = document.getElementById('organism-overlay');
+      if (overlay && overlay.style.display !== 'none') {
+        buildOrganismStats();
+        drawOrganismCanvas();
+      }
+    };
+  }
+
+  // ── CSS for organism overlay + word reveal ─────────────────────────
+  const trpCSS = document.createElement('style');
+  trpCSS.textContent = `
+    #organism-overlay { animation: trp-fade-in 0.35s ease; }
+    @keyframes trp-fade-in {
+      from { opacity:0; } to { opacity:1; }
+    }
+    #organism-canvas { cursor: default; }
+    /* Word reveal spans inside bible entries */
+    .entry.bible span { display:inline; }
+  `;
+  document.head.appendChild(trpCSS);
+
+  // ── Boot ───────────────────────────────────────────────────────────
+  function bootEqualization() {
+    setupWordRevealObserver();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootEqualization);
+  } else {
+    bootEqualization();
+  }
+
+})(); // end equalization patch
+</script>
+
+</body>
+</html>
