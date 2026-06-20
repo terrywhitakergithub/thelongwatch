@@ -2310,6 +2310,9 @@ function showPhaseCeremony(day){
   document.getElementById('modal-ceremony').style.display='flex';
 }
 
+// Expose const globals so bridge scripts can access via window.*
+window.State = State;
+window.LongWatchZeitgeist = LongWatchZeitgeist;
 window.addEventListener('DOMContentLoaded',init);
 </script>
 

@@ -1,5 +1,5 @@
 ﻿// Long Watch PWA â€” service worker
-const CACHE = 'longwatch-v1.2';
+const CACHE = 'longwatch-v1.3';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -21,5 +21,6 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => caches.match('/index.html')))
   );
 });
+
 
 
