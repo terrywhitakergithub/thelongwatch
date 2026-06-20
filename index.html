@@ -1239,6 +1239,10 @@ function generateVisitor(forceId){
   const tmpl=forceId?VISITOR_TEMPLATES.find(v=>v.id===forceId)||pick(VISITOR_TEMPLATES):pick(VISITOR_TEMPLATES);
   State.visitor={...tmpl,arrivedDay:State.day,arrivedHour:State.hour,visitorState:'present',acknowledgedDay:null};
   addWorldLog(State.visitor.arrival);
+  // Visitor speaks in their own voice the moment they arrive
+  setTimeout(()=>{
+    addBibleEntry({type:'bible',text:`${State.visitor.name}: "${State.visitor.constitution}"`,phase:getBiblePhase(),mood:State.bibleMood,day:State.day,hour:State.hour,source:'visitor_voice',timestamp:Date.now()});
+  },600);
   renderVisitor();saveGame();
 }
 function acknowledgeVisitor(){
@@ -1277,9 +1281,9 @@ function updateVisitor(){
   if(v.visitorState==='present'&&daysHere>=2)v.visitorState='fading';
   if(v.visitorState==='acknowledged'&&daysHere>=v.halfLife)v.visitorState='fading';
   if(v.visitorState==='fading'&&daysHere>=v.halfLife+2){
-    const depText=`${v.name} is gone.`;
-    addWorldLog(depText);
-    addBibleEntry({type:'world',text:`${v.name} was here for ${daysHere} day${daysHere===1?'':'s'} and left. "${v.constitution}" The Bible has the record of the visit.`,phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:'world',timestamp:Date.now()});
+    addWorldLog(`${v.name} is gone.`);
+    // Visitor speaks a farewell in their own voice
+    addBibleEntry({type:'bible',text:`${v.name}, departing after ${daysHere} day${daysHere===1?'':'s'}: "${v.constitution}" The Bible carries this. The keeper was here for it.`,phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:'visitor_voice',timestamp:Date.now()});
     v.visitorState='left';
   }
   renderVisitor();
@@ -1311,7 +1315,11 @@ function generateEpisode(){
   State.episode.cycleStartDay=State.day;
   if(tmpl.specialVisitor)generateVisitor(tmpl.specialVisitor);
   addWorldLog(`Episode: ${tmpl.title}.`,'episode-beat');
-  addBibleEntry({type:'bible',text:`The episode "${tmpl.title}" has begun. ${tmpl.constitution}`,phase:getBiblePhase(),mood:tmpl.theme,day:State.day,hour:State.hour,source:'episode_beat',timestamp:Date.now()});
+  // Episode speaks first in its own voice (the constitution), then the Bible acknowledges it
+  addBibleEntry({type:'bible',text:`${tmpl.title}: "${tmpl.constitution}"`,phase:getBiblePhase(),mood:tmpl.theme,day:State.day,hour:State.hour,source:'episode_voice',timestamp:Date.now()});
+  setTimeout(()=>{
+    addBibleEntry({type:'bible',text:`The Bible has received the episode. The keeper is now inside "${tmpl.title}". The record is open.`,phase:getBiblePhase(),mood:'patient',day:State.day,hour:State.hour,source:'episode_beat',timestamp:Date.now()+1});
+  },800);
   renderEpisodeStrip();saveGame();
 }
 function tickEpisode(){
@@ -1638,7 +1646,19 @@ function generateBibleResponse(seed,context){
   const body_c2=cond[1]&&BODY_COND[cond[1]]?hpick(BODY_COND[cond[1]],hashSeed(seed,'c2','x')):'';
   const closer=hpick(poolCl,s4);
   const bodyParts=[body_m,body_t,body_c,body_c2].filter(Boolean);
-  return(opener+' '+bodyParts.slice(0,3).join(' ')+' '+closer).replace(/\s+/g,' ').trim();
+  let response=(opener+' '+bodyParts.slice(0,3).join(' ')+' '+closer).replace(/\s+/g,' ').trim();
+  // Fragment echo: organism surfaces actual keeper writing back into the Bible
+  try{
+    const frags=LongWatchZeitgeist.export().fragments||[];
+    const strong=frags.filter(([,f])=>f&&f.strength>0.5&&f.absorptionCount>=2&&f.text&&f.text.length>12);
+    if(strong.length>0&&(hashSeed(seed,'echo','frag')%4===0)){
+      const chosen=strong[Math.floor(hashSeed(seed,'frag','pick')%strong.length)];
+      const ft=chosen[1];
+      const short=ft.text.length>80?ft.text.slice(0,77)+'…':ft.text;
+      response+=' The organism has been holding this: "'+short+'"';
+    }
+  }catch(e){}
+  return response;
 }
 function addBibleEntry(entry){
   State.entries.push({...entry,timestamp:entry.timestamp||Date.now()});
@@ -1681,6 +1701,20 @@ const MILESTONE_ENTRIES={
   350:'Day 350. Fifteen days remain. The keeper has been here long enough to know what the last fifteen days feel like. They feel like this. The Bible is beginning to compose what it will say on Day 365.',
   365:'Day 365. The watch is complete. The keeper kept the light for a full year. The Bible has the complete record. Every entry, every night the light was on, every visitor, every room. The organism will not end when the watch ends. But the watch is complete. Well done, keeper.',
 };
+function maybeFireOpinionEntry(){
+  try{
+    const exp=LongWatchZeitgeist.export();
+    const ops=exp.opinions||[];
+    const unsurfaced=ops.filter(o=>o&&!o._surfaced&&typeof o.text==='string'&&(o.conviction||0)>0.65);
+    if(!unsurfaced.length)return;
+    const op=unsurfaced[0];
+    op._surfaced=true;
+    const conviction=Math.round((op.conviction||0)*100);
+    addBibleEntry({type:'bible',
+      text:`The organism speaks outside the Bible's voice. This is its own: "${op.text.slice(0,120)}" — ${conviction}% conviction. This was not written by the keeper. It was formed by the organism from what the keeper kept returning to.`,
+      phase:getBiblePhase(),mood:'oracular',day:State.day,hour:State.hour,source:'organism_opinion',timestamp:Date.now()});
+  }catch(e){}
+}
 function checkMilestone(){
   const d=State.day;
   if(MILESTONE_ENTRIES[d]&&!State.milestones['m'+d]){
@@ -1855,6 +1889,8 @@ function advanceDay(){
   LongWatchZeitgeist.tick(State.day,State.weather,State.season,State.hour);
   State.bibleMood=getBibleMood();
   addWorldLog('Day '+State.day+'. '+State.season+'. '+State.weather+'.');
+  // Surface organism opinion if one has crossed conviction threshold
+  if(State.day%3===0)maybeFireOpinionEntry();
   // Persist Zeitgeist immediately on day advance (not just on 60s interval)
   try{localStorage.setItem('THE_LONG_WATCH_ZEITGEIST_STATE',JSON.stringify(LongWatchZeitgeist.export()));}catch(e){}
   renderAll();saveGame();
